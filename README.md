@@ -6,4 +6,6 @@
 
 ### Missing: Gang Garages, and maybe something else
 
-### Issues: if you put a broken vehicle, you can take it repaired.
+### Issues: 
+if you put a broken vehicle, you can take it repaired.
+Impound dont take money from the player.
