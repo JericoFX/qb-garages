@@ -1,6 +1,6 @@
-# Quasar App (jerico)
+# FX Garages by JericoFX
 
-A Quasar Framework app
+made with Quasar + Vue3
 
 ## Install the dependencies
 ```bash
