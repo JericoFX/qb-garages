@@ -71,9 +71,9 @@ function OpenDepotMenu()
             SendNUIMessage({
                 show = not show,
                 Vehicles = Vehicles,
-                IsImpound = Depot[currentGarage]["impound"] or false,
+                IsImpound = Depots[currentGarage]["impound"] or false,
                 garageType = currentGarage,
-                Garagelabel = Depot[currentGarage]["label"],
+                Garagelabel = Depots[currentGarage]["label"],
                 type = "impound"
             })
         end
@@ -86,7 +86,11 @@ function CloseMenu()
     SetNuiFocus(false, false)
 end
 -- CALLBACKS
-RegisterNUICallback("ExitApp", function(data) SetNuiFocus(false, false) end)
+RegisterNUICallback("ExitApp", function(cb)
+    print("Received")
+    SetNuiFocus(false, false)
+    cb({})
+end)
 
 RegisterNUICallback("OutVehicle", function(data, cb)
     local Plate = data.plate
@@ -185,9 +189,9 @@ function SpawnVehicle(plate, cb, IsHouse)
 
         end
     elseif IsHouse == "impound" then
-        if IsPositionOccupied(Depot[currentGarage].spawnPoint.x,
-                              Depot[currentGarage].spawnPoint.y,
-                              Depot[currentGarage].spawnPoint.z, 10, false,
+        if IsPositionOccupied(Depots[currentGarage].spawnPoint.x,
+                              Depots[currentGarage].spawnPoint.y,
+                              Depots[currentGarage].spawnPoint.z, 10, false,
                               true, false, 0, 0, 0, 0) == 1 then
             cb(false)
         else
@@ -203,7 +207,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                                      GetVehicleNumberPlateText(veh))
                         TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
                     end, plate)
-            end, Depot[currentGarage].spawnPoint, false)
+            end, Depots[currentGarage].spawnPoint, false)
             TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
         end
@@ -457,10 +461,10 @@ Citizen.CreateThread(function()
                            false, true, false, false, false)
                 if takeDist <= 1.5 then
                     if not IsPedInAnyVehicle(ped) then
-                        DrawText3Ds(Depots[k].takeVehicle.x,
-                                    Depots[k].takeVehicle.y,
-                                    Depots[k].takeVehicle.z + 0.5,
-                                    '~g~E~w~ - Garage')
+                        QBCore.Functions.DrawText3D(Depots[k].takeVehicle.x,
+                                                    Depots[k].takeVehicle.y,
+                                                    Depots[k].takeVehicle.z +
+                                                        0.5, '~g~E~w~ - Garage')
 
                         if IsControlJustPressed(0, 38) then
                             currentGarage = k
