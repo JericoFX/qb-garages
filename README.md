@@ -5,10 +5,3 @@
 ### Features: Dark mode, Responsive design (didnt tested), Langs.
 
 ### Missing: Gang Garages, and maybe something else
-
-### Issues: 
-if you put a broken vehicle, you can take it repaired.
-
-Impound dont take money from the player.
-
-Make the code readable taking out the f*** format

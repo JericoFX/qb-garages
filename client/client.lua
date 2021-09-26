@@ -87,7 +87,6 @@ function CloseMenu()
 end
 -- CALLBACKS
 RegisterNUICallback("ExitApp", function(cb)
-    print("Received")
     SetNuiFocus(false, false)
     cb({})
 end)
@@ -375,7 +374,6 @@ Citizen.CreateThread(function()
         local ped = PlayerPedId()
         local pos = GetEntityCoords(ped)
         local inGarageRange = false
-
         if next(HouseGarages) ~= nil and currentHouseGarage ~= nil then
             if hasGarageKey and next(HouseGarages[currentHouseGarage]) ~= nil and
                 next(HouseGarages[currentHouseGarage].takeVehicle) ~= nil then
