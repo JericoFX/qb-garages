@@ -4,4 +4,4 @@
 
 ### Features: Dark mode, Responsive design (didnt tested), Langs.
 
-### Missing: Gang Garages, and maybe something else
+### Missing: Gang Garages, Impound doesn't take money, 
