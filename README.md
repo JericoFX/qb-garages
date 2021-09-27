@@ -1,7 +1,36 @@
-# fx-garage
+# FX-GARAGE
 
-### Initial repository for fx-garage. This garage in the nui part has been made with Vue3 Composition API + Vuex + Quasar, the lua part is almost the same to prevent incompatibility issues, this is not the final release the vue part is a mess and the lua part too. this garage was made to practice Vue
+Fx-Garage is a work in progress re-imagination of qb-garages made in Vue 3 + Quasar + Vuex
 
-### Features: Dark mode, Responsive design (didnt tested), Langs.
+## Installation
 
-### Missing: Gang Garages, Impound doesn't take money, 
+Download the script, put the script on you'r resource's folder, dont rename it or if you want to rename it just change all the links on Vue's side, Start the resource on server.cfg
+
+```bash
+ensure fx-garage
+```
+
+## Usage
+
+```python
+Go to any garage and press E.
+```
+
+## Contributing
+```lua
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+```
+
+Please make sure to update tests as appropriate.
+
+## Bugs or TO-DO
+
+```lua
+* The impound doest take money
+* some JSON errors
+* Clear the Lua code
+* Gangs doesn't work yet 
+```
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
