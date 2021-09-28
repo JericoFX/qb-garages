@@ -26,8 +26,8 @@ Please make sure to update tests as appropriate.
 ## Bugs or TO-DO
 
 ```lua
-* The impound doest take money
-* some JSON errors
+* The impound doest take money //FIXED
+* some JSON errors //NO MORE
 * Clear the Lua code
 * Gangs doesn't work yet 
 ```

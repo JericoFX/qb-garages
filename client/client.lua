@@ -7,16 +7,15 @@ local PlayerGang = {}
 local show = false
 local CachedCamera = nil
 
-function OpenMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",
-                                     function(Vehicles)
+local function OpenMenu()
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
         for k, v in ipairs(Vehicles) do
             if not cacheVeh[Vehicles[k].plate] then
                 cacheVeh[Vehicles[k].plate] = {}
             end
             cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
+            cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
         end
-
         SetNuiFocus(true, true)
         SendNUIMessage({
             show = not show,
@@ -28,17 +27,16 @@ function OpenMenu()
         })
     end, currentGarage)
 end
-function OpenHouseMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetHouseVehicles",
-                                     function(Cars)
+local function OpenHouseMenu()
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetHouseVehicles",function(Cars)
         if Cars ~= nil then
             for k, v in ipairs(Cars) do
                 if not cacheVeh[Cars[k].plate] then
                     cacheVeh[Cars[k].plate] = {}
                 end
                 cacheVeh[Cars[k].plate].vehicle = Cars[k].vehicle
+                cacheVeh[Cars[k].plate].fuel = Cars[k].fuel
             end
-
             SetNuiFocus(true, true)
             SendNUIMessage({
                 show = not show,
@@ -56,37 +54,35 @@ function OpenHouseMenu()
 
 end
 
-function OpenDepotMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",
-                                     function(Vehicles)
+local function OpenDepotMenu()
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
         if Vehicles ~= nil then
             for k, v in ipairs(Vehicles) do
                 if not cacheVeh[Vehicles[k].plate] then
                     cacheVeh[Vehicles[k].plate] = {}
                 end
                 cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
+                cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
             end
-
             SetNuiFocus(true, true)
             SendNUIMessage({
                 show = not show,
                 Vehicles = Vehicles,
-                IsImpound = Depots[currentGarage]["impound"] or false,
+                IsImpound = true,
                 garageType = currentGarage,
                 Garagelabel = Depots[currentGarage]["label"],
                 type = "impound"
             })
         end
     end, currentGarage)
-
 end
 
-function CloseMenu()
+local function CloseMenu()
     SendNUIMessage({data = "hide", show = false})
     SetNuiFocus(false, false)
 end
 -- CALLBACKS
-RegisterNUICallback("ExitApp", function(cb)
+RegisterNUICallback("ExitApp", function(data, cb)
     SetNuiFocus(false, false)
     cb({})
 end)
@@ -97,35 +93,48 @@ RegisterNUICallback("OutVehicle", function(data, cb)
     SpawnVehicle(Plate, function(message) cb(message) end, Type)
 end)
 RegisterNUICallback("PayImpound", function(data, cb)
-    QBCore.Functions.TriggerCallback("fx-garage:server:HasMoney",
-                                     function(hasMoney) cb(hasMoney) end)
+    QBCore.Functions.TriggerCallback("fx-garage:server:HasMoney",function(hasMoney) 
+      cb(hasMoney) 
+    end)
 end)
+RegisterCommand('JericoFX', function() 
+    local Vehicle = QBCore.Functions.GetClosestVehicle()
+    local plate = GetVehicleNumberPlateText(Vehicle)
+    --Return the closest Vehicle to the player, Arguments Coords is Optional
+    local Engine = GetVehicleEngineHealth(Vehicle)
+    local Body = GetVehicleBodyHealth(Vehicle)
+    TriggerServerEvent("fx-garage:server:SetVehicleProps",{body=Body,engine=Engine},plate)
+end, false)
 
 function GetCarToGarage(plate, garage)
+    print(plate,garage)
     local Player = QBCore.Functions.GetPlayerData().citizenid
     local OtherPlayer = PlayerPedId()
     local Vehicle = GetVehiclePedIsIn(OtherPlayer)
+    local Engine = GetVehicleEngineHealth(Vehicle)
+    local Body = GetVehicleBodyHealth(Vehicle)
+    
     QBCore.Functions.TriggerCallback("fx-garage:server:CheckVeh", function(ID)
         if ID then
+            TriggerServerEvent("fx-garage:server:SetVehicleProps",{body=Body,engine=Engine},plate)
+          
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
+          
             Wait(2000)
             if IsPedInAnyVehicle(OtherPlayer) then
-                QBCore.Functions.Notify(
-                    "Something is preventing the car to despawn")
+                QBCore.Functions.Notify("Something is preventing the car to despawn")
                 return
             end
             if Vehicle then
-                local Proper = QBCore.Functions.GetVehicleProperties(Vehicle)
+                TriggerServerEvent("veh:server:SaveCar", garage, plate)
                 QBCore.Functions.DeleteVehicle(Vehicle)
-
-                TriggerServerEvent("veh:server:SaveCar", {Proper, garage, plate})
             end
-
         end
     end, plate, Player)
 end
 
 function SpawnVehicle(plate, cb, IsHouse)
+    print(plate,IsHouse)
     local ped = PlayerPedId()
     local pool = GetGamePool("CVehicle")
     for i = 0, #pool do
@@ -137,25 +146,17 @@ function SpawnVehicle(plate, cb, IsHouse)
                 return
             end
         end
-
     end
     if IsHouse == 'house' then
-        if IsPositionOccupied(HouseGarages[currentHouseGarage].takeVehicle.x,
-                              HouseGarages[currentHouseGarage].takeVehicle.y,
-                              HouseGarages[currentHouseGarage].takeVehicle.z,
-                              10, false, true, false, 0, 0, 0, 0) == 1 then
+        if IsPositionOccupied(HouseGarages[currentHouseGarage].takeVehicle.x, HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z, 10, false, true, false, 0, 0, 0, 0) == 1 then
             cb(false)
         else
-            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,
-                                          function(veh)
-                QBCore.Functions.TriggerCallback(
-                    "fx-garage:server:GetVehicleProps", function(mods)
+            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
+                QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
-
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                        TriggerEvent("vehiclekeys:client:SetOwner",
-                                     GetVehicleNumberPlateText(veh))
+                        TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskWarpPedIntoVehicle(ped, veh, -1)
                     end, plate)
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
@@ -188,25 +189,18 @@ function SpawnVehicle(plate, cb, IsHouse)
 
         end
     elseif IsHouse == "impound" then
-        if IsPositionOccupied(Depots[currentGarage].spawnPoint.x,
-                              Depots[currentGarage].spawnPoint.y,
-                              Depots[currentGarage].spawnPoint.z, 10, false,
-                              true, false, 0, 0, 0, 0) == 1 then
+        if IsPositionOccupied(Depots[currentGarage].takeVehicle.x,Depots[currentGarage].takeVehicle.y,Depots[currentGarage].takeVehicle.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
             cb(false)
         else
-            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,
-                                          function(veh)
-                QBCore.Functions.TriggerCallback(
-                    "fx-garage:server:GetVehicleProps", function(mods)
+            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
+                QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
-
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                        TriggerEvent("vehiclekeys:client:SetOwner",
-                                     GetVehicleNumberPlateText(veh))
-                        TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
-                    end, plate)
-            end, Depots[currentGarage].spawnPoint, false)
+                        TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
+                        TaskWarpPedIntoVehicle(ped, veh, -1)
+                end, plate)
+            end, Depots[currentGarage].takeVehicle, false)
             TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
         end
@@ -243,39 +237,23 @@ local isclose = false
 local isCloseToSave = false
 
 ---BLIPS AND 3D TEXT STUFF
-Citizen.CreateThread(function()
-    Citizen.Wait(1000)
+CreateThread(function()
+    Wait(1000)
     while true do
-        Citizen.Wait(5)
+        Wait(5)
         local ped = PlayerPedId()
         local pos = GetEntityCoords(ped)
         local inGarageRange = false
-
         for k, v in pairs(Garages) do
+            local takeDist = #(pos - vector3(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y, Garages[k].takeVehicle.z))
 
-            local takeDist = #(pos -
-                                 vector3(Garages[k].takeVehicle.x,
-                                         Garages[k].takeVehicle.y,
-                                         Garages[k].takeVehicle.z))
-
-            local saveDist = #(pos -
-                                 vector3(Garages[k].putVehicle.x,
-                                         Garages[k].putVehicle.y,
-                                         Garages[k].putVehicle.z))
-
+            local saveDist = #(pos - vector3(Garages[k].putVehicle.x, Garages[k].putVehicle.y,Garages[k].putVehicle.z))
             if takeDist <= 15 then
                 inGarageRange = true
-                DrawMarker(2, Garages[k].takeVehicle.x,
-                           Garages[k].takeVehicle.y, Garages[k].takeVehicle.z,
-                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 200, 0,
-                           0, 222, false, false, false, true, false, false,
-                           false)
+                DrawMarker(2, Garages[k].takeVehicle.x, Garages[k].takeVehicle.y, Garages[k].takeVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 200, 0,0, 222, false, false, false, true, false, false,false)
                 if takeDist <= 1.5 then
                     if not IsPedInAnyVehicle(ped) then
-                        QBCore.Functions.DrawText3D(Garages[k].takeVehicle.x,
-                                                    Garages[k].takeVehicle.y,
-                                                    Garages[k].takeVehicle.z +
-                                                        0.5, '~g~E~w~ - Garage')
+                        QBCore.Functions.DrawText3D(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z + 0.5, '~g~E~w~ - Garage')
                         currentGarage = k
                         isclose = true
                     end
@@ -292,10 +270,7 @@ Citizen.CreateThread(function()
                            false, true, false, false, false)
                 if saveDist <= 1.5 then
                     if IsPedInAnyVehicle(ped) then
-                        QBCore.Functions.DrawText3D(Garages[k].putVehicle.x,
-                                                    Garages[k].putVehicle.y,
-                                                    Garages[k].putVehicle.z +
-                                                        0.5, '~g~E~w~ - Garage')
+                        QBCore.Functions.DrawText3D(Garages[k].putVehicle.x,Garages[k].putVehicle.y,Garages[k].putVehicle.z + 0.5, '~g~E~w~ - Garage')
                         currentGarage = k
                         isCloseToSave = true
                     end
@@ -312,16 +287,12 @@ end)
 Citizen.CreateThread(function()
     for k, v in pairs(Garages) do
         if v.showBlip then
-            local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,
-                                           Garages[k].takeVehicle.y,
-                                           Garages[k].takeVehicle.z)
-
+            local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z)
             SetBlipSprite(Garage, 357)
             SetBlipDisplay(Garage, 4)
             SetBlipScale(Garage, 0.65)
             SetBlipAsShortRange(Garage, true)
             SetBlipColour(Garage, 3)
-
             BeginTextCommandSetBlipName("STRING")
             AddTextComponentSubstringPlayerName(Garages[k].label)
             EndTextCommandSetBlipName(Garage)
@@ -330,10 +301,7 @@ Citizen.CreateThread(function()
 
     for k, v in pairs(Depots) do
         if v.showBlip then
-            local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,
-                                          Depots[k].takeVehicle.y,
-                                          Depots[k].takeVehicle.z)
-
+            local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,Depots[k].takeVehicle.y,Depots[k].takeVehicle.z)
             SetBlipSprite(Depot, 68)
             SetBlipDisplay(Depot, 4)
             SetBlipScale(Depot, 0.7)
@@ -367,41 +335,29 @@ RegisterCommand('OpenMenu', function()
     end
 end)
 
-Citizen.CreateThread(function()
-    Citizen.Wait(2000)
+CreateThread(function()
+    Wait(2000)
     while true do
-        Citizen.Wait(5)
+        Wait(5)
         local ped = PlayerPedId()
         local pos = GetEntityCoords(ped)
         local inGarageRange = false
         if next(HouseGarages) ~= nil and currentHouseGarage ~= nil then
-            if hasGarageKey and next(HouseGarages[currentHouseGarage]) ~= nil and
-                next(HouseGarages[currentHouseGarage].takeVehicle) ~= nil then
+            if hasGarageKey and next(HouseGarages[currentHouseGarage]) and next(HouseGarages[currentHouseGarage]["takeVehicle"]) then
 
-                local house = vector3(HouseGarages[currentHouseGarage]
-                                          .takeVehicle.x,
-                                      HouseGarages[currentHouseGarage]
-                                          .takeVehicle.y,
-                                      HouseGarages[currentHouseGarage]
-                                          .takeVehicle.z)
+                local house = vector3(HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z)
 
                 local takeDist = #(pos - house)
 
                 if takeDist <= 15 then
                     inGarageRange = true
-                    DrawMarker(2,
-                               HouseGarages[currentHouseGarage].takeVehicle.x,
-                               HouseGarages[currentHouseGarage].takeVehicle.y,
-                               HouseGarages[currentHouseGarage].takeVehicle.z,
+            DrawMarker(2,HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z,
                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
                                200, 0, 0, 222, false, false, false, true, false,
                                false, false)
                     if takeDist < 2.0 then
                         if not IsPedInAnyVehicle(ped) then
-                            QBCore.Functions.DrawText3D(
-                                HouseGarages[currentHouseGarage].takeVehicle.x,
-                                HouseGarages[currentHouseGarage].takeVehicle.y,
-                                HouseGarages[currentHouseGarage].takeVehicle.z +
+                            QBCore.Functions.DrawText3D(HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z +
                                     0.5, '~g~E~w~ - Garage ' ..
                                     HouseGarages[currentHouseGarage].label)
 
@@ -415,10 +371,7 @@ Citizen.CreateThread(function()
                             end
 
                         elseif IsPedInAnyVehicle(ped) then
-                            QBCore.Functions.DrawText3D(
-                                HouseGarages[currentHouseGarage].takeVehicle.x,
-                                HouseGarages[currentHouseGarage].takeVehicle.y,
-                                HouseGarages[currentHouseGarage].takeVehicle.z +
+                            QBCore.Functions.DrawText3D(HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z +
                                     0.5, '~g~E~w~ - To Park')
                             if IsControlJustPressed(0, 38) then
                                 local curVeh = GetVehiclePedIsIn(ped)
@@ -447,10 +400,7 @@ Citizen.CreateThread(function()
         local inGarageRange = false
 
         for k, v in pairs(Depots) do
-            local takeDist = #(pos -
-                                 vector3(Depots[k].takeVehicle.x,
-                                         Depots[k].takeVehicle.y,
-                                         Depots[k].takeVehicle.z))
+            local takeDist = #(pos - vector3(Depots[k].takeVehicle.x,Depots[k].takeVehicle.y,Depots[k].takeVehicle.z))
             if takeDist <= 15 then
                 inGarageRange = true
                 DrawMarker(2, Depots[k].takeVehicle.x, Depots[k].takeVehicle.y,
