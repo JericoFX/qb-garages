@@ -1,6 +1,6 @@
-# Quasar App (jerico)
+# FX-GARAGE
 
-A Quasar Framework app
+QB GARAGE with NUI
 
 ## Install the dependencies
 ```bash
