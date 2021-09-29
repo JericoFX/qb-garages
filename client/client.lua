@@ -104,6 +104,8 @@ end
 local function CloseMenu()
     SendNUIMessage({data = "hide", show = false})
     SetNuiFocus(false, false)
+    currentGarage = nil
+    currentHouseGarage = nil
 end
 -- CALLBACKS
 RegisterNUICallback("ExitApp", function(data, cb)
@@ -517,8 +519,10 @@ Citizen.CreateThread(function()
                         if not IsPedInAnyVehicle(ped) then
                             QBCore.Functions.DrawText3D(GangGarages[Name].takeVehicle.x, GangGarages[Name].takeVehicle.y, GangGarages[Name].takeVehicle.z + 0.5, '~g~E~w~ - '..GangGarages[Name]["label"].. ' Garage')
                             if IsControlJustPressed(0, 38) then
-                                currentGarage = Name
+                                
                                 OpenGangMenu(Name)
+                                currentGarage = Name
+                               
                             end
                         else
                             QBCore.Functions.DrawText3D(GangGarages[Name].takeVehicle.x, GangGarages[Name].takeVehicle.y, GangGarages[Name].takeVehicle.z, GangGarages[Name].label)
