@@ -29,7 +29,8 @@ Please make sure to update tests as appropriate.
 * The impound doest take money //FIXED
 * some JSON errors //NO MORE
 * Clear the Lua code
-* Gangs doesn't work yet 
+* Gangs doesn't work yet  //DONE
+* Migrate to PolyZone
 ```
 
 ## License
