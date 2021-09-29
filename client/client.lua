@@ -153,40 +153,33 @@ function GetCarToGarage(plate, garage)
     end, plate, Player)
 end
 
-function GetVehicleDamage(Vehicle,Plate)
+-- function GetVehicleDamage(Vehicle,Plate)
     
-    if not DamageVeh[Plate] then
-        DamageVeh[Plate] = {}
-        DamageVeh[Plate].OldVehicle = Vehicle
-    end
-    --Windows
-    for i = 0,5 do
-        if IsVehicleTyreBurst(Vehicle, i, false) then
-          table.insert(DamageVeh[Plate],{ wheels = i})
+--     if not DamageVeh[Plate] then
+--         DamageVeh[Plate] = {}
+--         DamageVeh[Plate].OldVehicle = Vehicle
+--     end
+--     --Windows
+--     for i = 0,5 do
+--         if IsVehicleTyreBurst(Vehicle, i, false) then
+--           table.insert(DamageVeh[Plate],{ wheels = i})
  
-        end
-    end
+--         end
+--     end
     
 
-end
+-- end
 
-function SetVehicleDamage(Vehicle,plate)
-    if DamageVeh[plate] then
-        for k,v in pairs(DamageVeh[plate]) do
-            SetVehicleTyreBurst(Vehicle, v.wheels, true, 1000)
-        end
-    end
-end
-RegisterCommand('JericoFX', function() 
-    local Vehicle = GetVehiclePedIsIn(PlayerPedId())
-    local plate = GetVehicleNumberPlateText(Vehicle)
-    GetVehicleDamage(Vehicle,plate)
-    Wait(1000)
-       
-end, false)
+-- function SetVehicleDamage(Vehicle,plate)
+--     if DamageVeh[plate] then
+--         for k,v in pairs(DamageVeh[plate]) do
+--             SetVehicleTyreBurst(Vehicle, v.wheels, true, 1000)
+--         end
+--     end
+-- end DOEST WORK YET
+
 
 function SpawnVehicle(plate, cb, IsHouse)
-
     local ped = PlayerPedId()
     local pool = GetGamePool("CVehicle")
     for i = 0, #pool do
@@ -217,9 +210,9 @@ function SpawnVehicle(plate, cb, IsHouse)
 
         end
     elseif IsHouse == "garage" then
-        if IsPositionOccupied(Garages[currentGarage].takeVehicle.x,
-                              Garages[currentGarage].takeVehicle.y,
-                              Garages[currentGarage].takeVehicle.z, 10, false,
+        if IsPositionOccupied(Garages[currentGarage].spawnPoint.x,
+                              Garages[currentGarage].spawnPoint.y,
+                              Garages[currentGarage].spawnPoint.z, 10, false,
                               true, false, 0, 0, 0, 0) == 1 then
             cb(false)
         else
@@ -238,7 +231,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         
                       
                     end, plate)
-            end, Garages[currentGarage].putVehicle, false)
+            end, Garages[currentGarage].spawnPoint, false)
             TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
 
