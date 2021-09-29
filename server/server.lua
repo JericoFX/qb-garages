@@ -15,18 +15,17 @@ end)
 
 RegisterNetEvent('fx-garage:server:SetVehicleProps',function(data,plate)
     local src = source
-    print(json.encode(data),plate)
-    local Engine = data.engine
-    local Body = data.body
+    local Engine = math.floor(data.engine + 0.5)
+    local Body = math.floor(data.body + 0.5)
     local Mods
     local ModsPlate = exports.oxmysql:fetchSync('SELECT mods FROM player_vehicles WHERE plate = ?', {plate})
     if ModsPlate[1].mods ~= nil then 
         Mods = json.decode(ModsPlate[1].mods)
-        Mods.engine = Engine
-        Mods.body = Body
+        Mods.engine = data.engine
+        Mods.body = data.body
     end
     
-    local result = exports.oxmysql:fetchSync('UPDATE player_vehicles SET mods = ? WHERE plate= ?', {json.encode(Mods),plate})
+    local result = exports.oxmysql:fetchSync('UPDATE player_vehicles SET engine = ?,body = ? WHERE plate= ?', {Engine,Body,plate})
 end)
 
 QBCore.Functions.CreateCallback("fx-garage:server:CheckVeh",function(source, cb, plate, citizenid)
