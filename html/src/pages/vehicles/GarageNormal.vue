@@ -81,7 +81,7 @@ export default {
     const type = computed(() => Store.getters['garage/GetType'])
 
     const DeleteVehicle = (plate) => {
-      axios.post('https://fx-garage/OutVehicle', JSON.stringify({ plate: plate, type: type.value })).then(function (Spawned) {
+      axios.post(`https://${GetCurrentResourceName()}/OutVehicle`, JSON.stringify({ plate: plate, type: type.value })).then(function (Spawned) {
         if (Spawned.data) {
           Noti()
           Store.dispatch('garage/DeleteVeh', plate)
