@@ -591,3 +591,45 @@ function tPrint(tbl, indent)
         end
     end
 end
+
+--[[
+local vehProps  = ESX.Game.GetVehicleProperties(veh)
+local damages	= {
+	eng = GetVehicleEngineHealth(veh),
+	bod = GetVehicleBodyHealth(veh),
+	tnk = GetVehiclePetrolTankHealth(veh),
+	drt = GetVehicleDirtLevel(veh),
+	oil = GetVehicleOilLevel(veh),
+	drvlyt = GetIsLeftVehicleHeadlightDamaged(veh),
+	paslyt = GetIsRightVehicleHeadlightDamaged(veh),
+	dor = {},
+	win = {},
+	tyr = {}
+}
+local vehPos    = GetEntityCoords(veh)
+local vehHead   = GetEntityHeading(veh)
+for i = 0,5 do
+	table.insert(damages.dor, i)
+	damages.dor[i] = false
+	if not DoesVehicleHaveDoor(veh, i) then
+		damages.dor[i] = true
+	end
+end
+for i = 0,13 do
+	table.insert(damages.win, i)
+	damages.win[i] = false
+	if not IsVehicleWindowIntact(veh, i) then
+		damages.win[i] = true
+	end
+end
+for i = 0,7 do
+	table.insert(damages.tyr, i)
+	damages.tyr[i] = false
+	if IsVehicleTyreBurst(veh, i, false) then
+		damages.tyr[i] = 'popped'
+	elseif IsVehicleTyreBurst(veh, i, true) then
+		damages.tyr[i] = 'gone'
+	end
+end
+https://forum.cfx.re/t/esx-how-to-save-vehicle-damage/475917/36
+--]]
