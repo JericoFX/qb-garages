@@ -5,11 +5,10 @@ local currentGarage = nil
 local OutsideVehicles = {}
 local PlayerGang = {}
 local show = false
-local CachedCamera = nil
 local DamageVeh = {}
 
 local function OpenMenu()
-    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
         for k, v in ipairs(Vehicles) do
             if not cacheVeh[Vehicles[k].plate] then
                 cacheVeh[Vehicles[k].plate] = {}
@@ -28,8 +27,9 @@ local function OpenMenu()
         })
     end, currentGarage)
 end
+
 local function OpenHouseMenu()
-    QBCore.Functions.TriggerCallback("qb-garages:server:GetHouseVehicles",function(Cars)
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetHouseVehicles",function(Cars)
         if Cars ~= nil then
             for k, v in ipairs(Cars) do
                 if not cacheVeh[Cars[k].plate] then
@@ -56,7 +56,7 @@ local function OpenHouseMenu()
 end
 
 local function OpenDepotMenu()
-    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
         if Vehicles ~= nil then
             for k, v in ipairs(Vehicles) do
                 if not cacheVeh[Vehicles[k].plate] then
@@ -77,8 +77,9 @@ local function OpenDepotMenu()
         end
     end, currentGarage)
 end
+
 local function OpenGangMenu(garage)
-    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
         if Vehicles ~= nil then
             for k, v in ipairs(Vehicles) do
                 if not cacheVeh[Vehicles[k].plate] then
@@ -118,87 +119,100 @@ RegisterNUICallback("OutVehicle", function(data, cb)
     local Type = data.type
     SpawnVehicle(Plate, function(message) cb(message) end, Type)
 end)
+
 RegisterNUICallback("PayImpound", function(data, cb)
-    QBCore.Functions.TriggerCallback("qb-garages:server:HasMoney",function(hasMoney)
+    QBCore.Functions.TriggerCallback("fx-garage:server:HasMoney",function(hasMoney)
         cb(hasMoney)
     end)
 end)
 
 
-function GetCarToGarage(plate, garage)
 
+function GetCarToGarage(plate, garage)
     local Player = QBCore.Functions.GetPlayerData().citizenid
     local OtherPlayer = PlayerPedId()
     local Vehicle = GetVehiclePedIsIn(OtherPlayer)
     local Engine = GetVehicleEngineHealth(Vehicle)
     local Body = GetVehicleBodyHealth(Vehicle)
 
-    QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
+    QBCore.Functions.TriggerCallback("fx-garage:server:CheckVeh", function(ID)
         if ID then
             GetVehicleDamage(Vehicle,plate)
-            TriggerServerEvent("qb-garages:server:SetVehicleProps",{body=Body,engine=Engine},plate)
-
+            TriggerServerEvent("fx-garage:server:SetVehicleProps",{body=Body,engine=Engine},plate)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
-
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then
                 QBCore.Functions.Notify("Something is preventing the car to despawn")
                 return
             end
             if Vehicle then
-                TriggerServerEvent("qb-garages:server:SaveCar", garage, plate)
+                TriggerServerEvent("veh:server:SaveCar", garage, plate)
                 QBCore.Functions.DeleteVehicle(Vehicle)
             end
         end
     end, plate, Player)
 end
 
-function GetVehicleDamage(Vehicle,Plate)
--- if not DamageVeh[Plate] then
---     DamageVeh[Plate] = {}
--- end
--- if not DamageVeh[Plate].windows then
---     DamageVeh[Plate].windows = {}
--- end
--- if not DamageVeh[Plate].wheels then
---     DamageVeh[Plate].wheels = {}
--- end
--- -- for i = 0,6,1 do
--- --     local res = IsVehicleTyreBurst(Vehicle, i,false );
--- --     if res  then
--- -- 		DamageVeh[Plate].wheels[#DamageVeh[Plate].wheels+1] = res;
--- -- 	else
--- -- 		DamageVeh[Plate].wheels[#DamageVeh[Plate].wheels+1] = false;
--- -- 	end
--- -- end
+function GetVehicleDamage(veh,Plate)
+if not  DamageVeh[Plate] then
+    DamageVeh[Plate] = {}
+end
+--      DamageVeh[Plate]	= {
+--         dor = {},
+--         win = {},
+--         tyr = {}
+--     }
+   
+--     for i = 0,GetNumberOfVehicleDoors(veh) do
+--         table.insert(DamageVeh[Plate].dor, i)
+--         DamageVeh[Plate].dor[i] = false
+--         if not DoesVehicleHaveDoor(veh, i) then
+--             DamageVeh[Plate].dor[i] = true
+--         end
+--     end
 
--- -- for k,v in pairs() do
--- -- 	local res = IsVehicleWindowIntact(Vehicle,i);
--- -- 	if res then
--- -- 		DamageVeh[Plate].windows[#DamageVeh[Plate].windows+1] = res;
--- -- 	else
--- -- 		DamageVeh[Plate].windows[#DamageVeh[Plate].windows+1] = true;
--- -- 	end
--- -- end
--- for i = 0,5 do
---     if IsVehicleTyreBurst(Vehicle, i,false) then
---         table.insert(DamageVeh[Plate],{wheels = i})
+--     for i = 0,7 do
+--         table.insert(DamageVeh[Plate].win, i)
+--         DamageVeh[Plate].win[i] = false
+--         if not IsVehicleWindowIntact(veh, i) then
+--             DamageVeh[Plate].win[i] = true
+--         end
+--     end
+--     if IsThisModelABike(`veh`) then
+--     for i = 0,GetVehicleNumberOfWheels(veh) do
+--         table.insert(DamageVeh[Plate].tyr, i)
+--         DamageVeh[Plate].tyr[i] = false
+--         if IsVehicleTyreBurst(veh, i, false) then
+--             DamageVeh[Plate].tyr[i] = 'popped'
+--         elseif IsVehicleTyreBurst(veh, i, true) then
+--             DamageVeh[Plate].tyr[i] = 'gone'
+--         end
+--     end
+-- else
+--     for i = 0,GetVehicleNumberOfWheels(veh) do
+--         table.insert(DamageVeh[Plate].tyr, i)
+--         DamageVeh[Plate].tyr[i] = false
+--         if IsVehicleTyreBurst(veh, i, false) then
+--             DamageVeh[Plate].tyr[i] = 'popped'
+--         elseif IsVehicleTyreBurst(veh, i, true) then
+--             DamageVeh[Plate].tyr[i] = 'gone'
+--         end
 --     end
 -- end
-
 end
 
+-- RegisterCommand('JericoFX', function() 
+-- local Vehicle = QBCore.Functions.GetClosestVehicle()
+-- --Return the closest Vehicle to the player, Arguments Coords is Optional
+-- local Plate = GetVehicleNumberPlateText(Vehicle)
+-- GetVehicleDamage(Vehicle,Plate)
+-- Wait(1000)
+--     print( )
+
+-- end, false)
+
 function SetVehicleDamage(Vehicle,plate)
---     if DamageVeh[plate] then
---         for k,v in pairs(DamageVeh[plate]) do
---             SetVehicleTyreBurst(Vehicle, DamageVeh[plate][k].wheels,true,1000)
---         end
---         for windowIndex = 0, 13, 1 do
--- 			if(DamageVeh[plate].windows[windowIndex] == 1) then
--- 				RemoveVehicleWindow(Vehicle, windowIndex);
--- 			end
--- 		end
---     end
+
 end
 
 
@@ -221,7 +235,7 @@ function SpawnVehicle(plate, cb, IsHouse)
             cb(false)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
-                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                     QBCore.Functions.SetVehicleProperties(veh, mods)
                     SetVehicleNumberPlateText(veh, plate)
                     exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -230,7 +244,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                     SetVehicleDamage(veh,plate)
                 end, plate)
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
-            TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
 
         end
@@ -241,7 +255,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
 
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -250,7 +264,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         SetVehicleDamage(veh,plate)
                     end, plate)
             end, Garages[currentGarage].putVehicle, false)
-            TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
 
         end
@@ -261,7 +275,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
 
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -270,7 +284,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         SetVehicleDamage(veh,plate)
                     end, plate)
             end, Depots[currentGarage].takeVehicle, false)
-            TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
         end
     elseif IsHouse == "gangs" then
@@ -280,7 +294,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
 
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -289,7 +303,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                     end, plate)
                     SetVehicleDamage(veh,plate)
             end, GangGarages[currentGarage].spawnPoint, false)
-            TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            TriggerServerEvent("fx-garage:server:UpdateState", plate)
             cb(true)
         end
     end
@@ -591,45 +605,3 @@ function tPrint(tbl, indent)
         end
     end
 end
-
---[[
-local vehProps  = ESX.Game.GetVehicleProperties(veh)
-local damages	= {
-	eng = GetVehicleEngineHealth(veh),
-	bod = GetVehicleBodyHealth(veh),
-	tnk = GetVehiclePetrolTankHealth(veh),
-	drt = GetVehicleDirtLevel(veh),
-	oil = GetVehicleOilLevel(veh),
-	drvlyt = GetIsLeftVehicleHeadlightDamaged(veh),
-	paslyt = GetIsRightVehicleHeadlightDamaged(veh),
-	dor = {},
-	win = {},
-	tyr = {}
-}
-local vehPos    = GetEntityCoords(veh)
-local vehHead   = GetEntityHeading(veh)
-for i = 0,5 do
-	table.insert(damages.dor, i)
-	damages.dor[i] = false
-	if not DoesVehicleHaveDoor(veh, i) then
-		damages.dor[i] = true
-	end
-end
-for i = 0,13 do
-	table.insert(damages.win, i)
-	damages.win[i] = false
-	if not IsVehicleWindowIntact(veh, i) then
-		damages.win[i] = true
-	end
-end
-for i = 0,7 do
-	table.insert(damages.tyr, i)
-	damages.tyr[i] = false
-	if IsVehicleTyreBurst(veh, i, false) then
-		damages.tyr[i] = 'popped'
-	elseif IsVehicleTyreBurst(veh, i, true) then
-		damages.tyr[i] = 'gone'
-	end
-end
-https://forum.cfx.re/t/esx-how-to-save-vehicle-damage/475917/36
---]]
