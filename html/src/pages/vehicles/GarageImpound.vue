@@ -127,7 +127,7 @@ export default {
     const type = computed(() => Store.getters['garage/GetType'])
 
     const CheckForMoney = (plate) => {
-      axios.post('https://fx-garage/PayImpound').then(function (HasMoney) { // GETTING THE MONEY FROM THE PLAYER
+      axios.post(`https://${GetCurrentResourceName()}/PayImpound`).then(function (HasMoney) { // GETTING THE MONEY FROM THE PLAYER
         if (HasMoney.data) {
           $q.notify({
             color: 'primary',
