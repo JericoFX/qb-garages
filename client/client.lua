@@ -9,7 +9,7 @@ local CachedCamera = nil
 local DamageVeh = {}
 
 local function OpenMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
         for k, v in ipairs(Vehicles) do
             if not cacheVeh[Vehicles[k].plate] then
                 cacheVeh[Vehicles[k].plate] = {}
@@ -29,7 +29,7 @@ local function OpenMenu()
     end, currentGarage)
 end
 local function OpenHouseMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetHouseVehicles",function(Cars)
+    QBCore.Functions.TriggerCallback("qb-garages:server:GetHouseVehicles",function(Cars)
         if Cars ~= nil then
             for k, v in ipairs(Cars) do
                 if not cacheVeh[Cars[k].plate] then
@@ -56,7 +56,7 @@ local function OpenHouseMenu()
 end
 
 local function OpenDepotMenu()
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
         if Vehicles ~= nil then
             for k, v in ipairs(Vehicles) do
                 if not cacheVeh[Vehicles[k].plate] then
@@ -78,7 +78,7 @@ local function OpenDepotMenu()
     end, currentGarage)
 end
 local function OpenGangMenu(garage)
-    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicles",function(Vehicles)
+    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
         if Vehicles ~= nil then
             for k, v in ipairs(Vehicles) do
                 if not cacheVeh[Vehicles[k].plate] then
@@ -119,7 +119,7 @@ RegisterNUICallback("OutVehicle", function(data, cb)
     SpawnVehicle(Plate, function(message) cb(message) end, Type)
 end)
 RegisterNUICallback("PayImpound", function(data, cb)
-    QBCore.Functions.TriggerCallback("fx-garage:server:HasMoney",function(hasMoney)
+    QBCore.Functions.TriggerCallback("qb-garages:server:HasMoney",function(hasMoney)
         cb(hasMoney)
     end)
 end)
@@ -133,10 +133,10 @@ function GetCarToGarage(plate, garage)
     local Engine = GetVehicleEngineHealth(Vehicle)
     local Body = GetVehicleBodyHealth(Vehicle)
 
-    QBCore.Functions.TriggerCallback("fx-garage:server:CheckVeh", function(ID)
+    QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
         if ID then
             GetVehicleDamage(Vehicle,plate)
-            TriggerServerEvent("fx-garage:server:SetVehicleProps",{body=Body,engine=Engine},plate)
+            TriggerServerEvent("qb-garages:server:SetVehicleProps",{body=Body,engine=Engine},plate)
 
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
 
@@ -146,7 +146,7 @@ function GetCarToGarage(plate, garage)
                 return
             end
             if Vehicle then
-                TriggerServerEvent("fx-garage:server:SaveCar", garage, plate)
+                TriggerServerEvent("qb-garages:server:SaveCar", garage, plate)
                 QBCore.Functions.DeleteVehicle(Vehicle)
             end
         end
@@ -221,7 +221,7 @@ function SpawnVehicle(plate, cb, IsHouse)
             cb(false)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
-                QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
+                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                     QBCore.Functions.SetVehicleProperties(veh, mods)
                     SetVehicleNumberPlateText(veh, plate)
                     exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -230,7 +230,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                     SetVehicleDamage(veh,plate)
                 end, plate)
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
-            TriggerServerEvent("fx-garage:server:UpdateState", plate)
+            TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
 
         end
@@ -241,7 +241,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
 
-                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -250,7 +250,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         SetVehicleDamage(veh,plate)
                     end, plate)
             end, Garages[currentGarage].putVehicle, false)
-            TriggerServerEvent("fx-garage:server:UpdateState", plate)
+            TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
 
         end
@@ -261,7 +261,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
 
-                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -270,7 +270,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         SetVehicleDamage(veh,plate)
                     end, plate)
             end, Depots[currentGarage].takeVehicle, false)
-            TriggerServerEvent("fx-garage:server:UpdateState", plate)
+            TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
         end
     elseif IsHouse == "gangs" then
@@ -280,7 +280,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
 
-                    QBCore.Functions.TriggerCallback("fx-garage:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
@@ -289,7 +289,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                     end, plate)
                     SetVehicleDamage(veh,plate)
             end, GangGarages[currentGarage].spawnPoint, false)
-            TriggerServerEvent("fx-garage:server:UpdateState", plate)
+            TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
         end
     end
