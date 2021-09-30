@@ -36,7 +36,7 @@ export default defineComponent({
     });
     const ByeBye = () => {
       Store.dispatch('garage/GarageTitle', "")
-      axios.post('https://fx-garage/ExitApp');
+      axios.post(`https://${GetCurrentResourceName()}/ExitApp`);
       show.value = false;
     };
     return {
