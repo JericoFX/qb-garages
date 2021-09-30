@@ -19,12 +19,12 @@ RegisterNetEvent('fx-garage:server:SetVehicleProps',function(data,plate)
     local Body = math.floor(data.body + 0.5)
     local Mods
     local ModsPlate = exports.oxmysql:fetchSync('SELECT mods FROM player_vehicles WHERE plate = ?', {plate})
-    if ModsPlate[1].mods ~= nil then 
+    if ModsPlate[1].mods  then
         Mods = json.decode(ModsPlate[1].mods)
         Mods.engine = data.engine
         Mods.body = data.body
     end
-    
+
     local result = exports.oxmysql:fetchSync('UPDATE player_vehicles SET engine = ?,body = ? WHERE plate= ?', {Engine,Body,plate})
 end)
 
@@ -38,7 +38,7 @@ RegisterNetEvent('fx-garage:server:UpdateState', function(plate)
     local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET state = 0, garage = "" WHERE plate = ?',{plate})
 end)
 
-RegisterNetEvent('veh:server:SaveCar', function(garage,plate)
+RegisterNetEvent('fx-garage:server:SaveCar', function(garage,plate)
     local Garage = tostring(garage)
     local Plate = tostring(plate)
     exports.oxmysql:execute('UPDATE player_vehicles SET state = 1, garage = ? WHERE plate = ?',{Garage, Plate})
@@ -53,7 +53,7 @@ QBCore.Functions.CreateCallback('fx-garage:server:HasMoney',function(source, cb)
     else
         cb(false)
     end
-    
+
 end)
 
 QBCore.Functions.CreateCallback("fx-garage:server:GetHouseVehicles",function(source, cb, house)
@@ -74,8 +74,8 @@ QBCore.Functions.CreateCallback("qb-garage:server:checkVehicleHouseOwner",functi
     exports.oxmysql:fetch('SELECT * FROM player_vehicles WHERE plate = ?',{plate}, function(result)
         if result[1] ~= nil then
             local hasHouseKey = exports['qb-houses']:hasKey(result[1].license,
-                                                            result[1].citizenid,
-                                                            house)
+                result[1].citizenid,
+                house)
             if hasHouseKey then
                 cb(true)
             else

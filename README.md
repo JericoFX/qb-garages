@@ -30,6 +30,7 @@ Please make sure to update tests as appropriate.
 * some JSON errors //NO MORE
 * Clear the Lua code
 * Gangs doesn't work yet  //DONE
+* Save Damage
 * Migrate to PolyZone
 ```
 
