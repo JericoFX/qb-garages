@@ -7,7 +7,7 @@ qb-garages is a work in progress re-imagination of qb-garages made in Vue 3 + Qu
 Download the script, put the script on you'r resource's folder, dont rename it or if you want to rename it just change all the links on Vue's side, Start the resource on server.cfg
 
 ```bash
-ensure fx-garage
+ensure qb-garages
 ```
 
 ## Usage
