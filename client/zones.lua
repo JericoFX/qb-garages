@@ -86,7 +86,7 @@ CreateThread(function()
             takeVehicle = {}
         }
         --------------------------- SAVE VEHICLE -----------------------------
-        Zones[k].takeVehicle = BoxZone:Create(Depots[k].takeVehicle,3.0,5.0,{
+        Zones[k].takeVehicle = BoxZone:Create(Depots[k].takeVehicle,5.0,8.0,{
             name=k,
             debugPoly = true,
             minZ = Depots[k].takeVehicle.z - 1,
@@ -129,7 +129,7 @@ CreateThread(function()
             SpawnVehicle = {}
         }
         --------------------------- SAVE VEHICLE -----------------------------
-        Zones[k].PutVehicle = BoxZone:Create(GangGarages[k].putVehicle,3.0,5.0,{
+        Zones[k].PutVehicle = BoxZone:Create(GangGarages[k].putVehicle,5.0,8.0,{
             name=k,
             debugPoly = false,
             minZ = GangGarages[k].putVehicle.z - 1,
@@ -162,7 +162,6 @@ CreateThread(function()
             end
         end)
         ---------------------------  -----------------------------
-
         exports['qb-menu']:AddBoxZone(k,Zones[k].PutVehicle.startPos,3.0,5.0,{
             name = k,
             heading = 180,
@@ -178,8 +177,6 @@ CreateThread(function()
                 }
             }
         })
-
-
         exports['qb-menu']:AddBoxZone(k,Zones[k].OpenMenu.startPos,3.0,5.0,{
             name = k,
             heading = 13.1,
@@ -195,7 +192,6 @@ CreateThread(function()
                 }
             }
         })
-
     end
       
 end)

@@ -170,7 +170,6 @@ end
 
 
 function SpawnVehicle(plate, cb, IsHouse)
-    
     local ped = PlayerPedId()
     local pool = GetGamePool("CVehicle")
     for i = 0, #pool do
@@ -218,7 +217,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
  
                     end, plate)
-            end, Garages[CurrentGarage].putVehicle, false)
+            end, Garages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
         end
@@ -289,51 +288,51 @@ end)
 local isclose = false
 local isCloseToSave = false
 ---BLIPS AND 3D TEXT STUFF
-CreateThread(function()
-    Wait(1000)
-    while true do
-        Wait(5)
-        local ped = PlayerPedId()
-        local pos = GetEntityCoords(ped)
-        local inGarageRange = false
-        for k, v in pairs(Garages) do
-            local takeDist = #(pos - vector3(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y, Garages[k].takeVehicle.z))
-            local saveDist = #(pos - vector3(Garages[k].putVehicle.x, Garages[k].putVehicle.y,Garages[k].putVehicle.z))
-            if takeDist <= 15 then
-                inGarageRange = true
-                DrawMarker(2, Garages[k].takeVehicle.x, Garages[k].takeVehicle.y, Garages[k].takeVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 200, 0,0, 222, false, false, false, true, false, false,false)
-                if takeDist <= 1.5 then
-                    if not IsPedInAnyVehicle(ped) then
-                        QBCore.Functions.DrawText3D(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z + 0.5, '~g~E~w~ - Garage')
-                        currentGarage = k
-                        isclose = true
-                    end
-                end
-                if takeDist >= 2 then isclose = false end
-            end
+-- CreateThread(function()
+--     Wait(1000)
+--     while true do
+--         Wait(5)
+--         local ped = PlayerPedId()
+--         local pos = GetEntityCoords(ped)
+--         local inGarageRange = false
+--         for k, v in pairs(Garages) do
+--             local takeDist = #(pos - vector3(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y, Garages[k].takeVehicle.z))
+--             local saveDist = #(pos - vector3(Garages[k].putVehicle.x, Garages[k].putVehicle.y,Garages[k].putVehicle.z))
+--             if takeDist <= 15 then
+--                 inGarageRange = true
+--                 DrawMarker(2, Garages[k].takeVehicle.x, Garages[k].takeVehicle.y, Garages[k].takeVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 200, 0,0, 222, false, false, false, true, false, false,false)
+--                 if takeDist <= 1.5 then
+--                     if not IsPedInAnyVehicle(ped) then
+--                         QBCore.Functions.DrawText3D(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z + 0.5, '~g~E~w~ - Garage')
+--                         currentGarage = k
+--                         isclose = true
+--                     end
+--                 end
+--                 if takeDist >= 2 then isclose = false end
+--             end
 
-            ------------------SAVE VEHICLE
-            if saveDist <= 15 then
-                inGarageRange = true
-                DrawMarker(2, Garages[k].putVehicle.x, Garages[k].putVehicle.y,
-                    Garages[k].putVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.3, 0.2, 0.15, 200, 0, 0, 222, false, false,
-                    false, true, false, false, false)
-                if saveDist <= 1.5 then
-                    if IsPedInAnyVehicle(ped) then
-                        QBCore.Functions.DrawText3D(Garages[k].putVehicle.x,Garages[k].putVehicle.y,Garages[k].putVehicle.z + 0.5, '~g~E~w~ - Garage')
-                        currentGarage = k
-                        isCloseToSave = true
-                    end
-                end
-                if saveDist >= 2 then isCloseToSave = false end
-            end
-        end
+--             ------------------SAVE VEHICLE
+--             if saveDist <= 15 then
+--                 inGarageRange = true
+--                 DrawMarker(2, Garages[k].putVehicle.x, Garages[k].putVehicle.y,
+--                     Garages[k].putVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0,
+--                     0.0, 0.3, 0.2, 0.15, 200, 0, 0, 222, false, false,
+--                     false, true, false, false, false)
+--                 if saveDist <= 1.5 then
+--                     if IsPedInAnyVehicle(ped) then
+--                         QBCore.Functions.DrawText3D(Garages[k].putVehicle.x,Garages[k].putVehicle.y,Garages[k].putVehicle.z + 0.5, '~g~E~w~ - Garage')
+--                         currentGarage = k
+--                         isCloseToSave = true
+--                     end
+--                 end
+--                 if saveDist >= 2 then isCloseToSave = false end
+--             end
+--         end
 
-        if not inGarageRange then Citizen.Wait(5000) end
-    end
+--         if not inGarageRange then Citizen.Wait(5000) end
+--     end
 
-end)
+-- end)
 
 Citizen.CreateThread(function()
     for k, v in pairs(Garages) do
