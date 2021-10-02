@@ -95,7 +95,8 @@ Garages = {
         spawnPoint = vector4(1730.31, 3711.07, 34.2, 20.5),
         putVehicle = vector3(1737.13, 3718.91, 34.04),
         showBlip = true,
-        minZ = 0
+        minZ = 0,
+        maxZ = 0
     },
     ["haanparking"] = {
         label = "Bell Farms Parking",
@@ -119,7 +120,9 @@ Garages = {
         label = "Pillbox Garage Parking",
         takeVehicle = vector3(215.9499, -809.698, 30.731),
         spawnPoint = vector4(234.1942, -787.066, 30.193, 159.6),
-        putVehicle = vector3(212.5, -798.55, 30.87),
+        putVehicle = vector3(214.44, -792.19, 30.85),
+        minZ = 0,
+        maxZ = 0,
         showBlip = true
     }
 
