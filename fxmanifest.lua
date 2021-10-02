@@ -6,7 +6,8 @@ version '1.0.0'
 author 'JericoFX'
 ui_page 'html/index.html'
 
-client_script 'client/client.lua'
+client_scripts {  '@PolyZone/client.lua',
+'@PolyZone/BoxZone.lua','client/zones.lua','client/client.lua'}
 
 shared_script {'@qb-core/import.lua', 'config.lua'}
 
