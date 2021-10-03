@@ -1,5 +1,5 @@
 <template>
-  <div class="Garage  absolute-top text-center text-h1 bg-grey-1 ellipsis">
+  <div class="Garage absolute-top text-center text-h1 bg-grey-1 ellipsis non-selectable">
     {{GarageGame}}
   </div>
 </template>
@@ -25,6 +25,7 @@ export default {
 .Garage {
   max-width: 1237px;
   max-height: 114px;
+  height: 112px;
   left: 68px;
   top: 46px;
   border-radius: 10px;

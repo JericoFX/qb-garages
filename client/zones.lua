@@ -10,15 +10,16 @@ CreateThread(function()
             SpawnVehicle = {}
         }
         --------------------------- SAVE VEHICLE -----------------------------
-        Zones[k].PutVehicle = BoxZone:Create(Garages[k].putVehicle,25.0,17.0,{
+        Zones[k].PutVehicle = BoxZone:Create(Garages[k].putVehicle,Garages[k].length or 18.8,Garages[k].width or 18.8,{
             name=k,
-            heading = 340,
+            heading = Garages[k].heading,
             debugPoly = false,
             minZ = Garages[k].putVehicle.z - 1,
             maxZ = Garages[k].putVehicle.z + 2
         })
         Zones[k].PutVehicle:onPlayerInOut(function(isInside, point)
             if isInside then
+             
                 InsideSaveVehicle = true
                 CurrentGarage = Zones[k].PutVehicle.name
             else
@@ -45,7 +46,7 @@ CreateThread(function()
         end)
         ---------------------------  -----------------------------
 
-        exports['qb-menu']:AddBoxZone(k,Zones[k].PutVehicle.startPos,25.0,17.0,{
+        exports['qb-menu']:AddBoxZone(k,Zones[k].PutVehicle.startPos,Garages[k].length or 18.8,Garages[k].width or 18.8,{
             name = k,
             heading = 180,
             debugPoly = false,

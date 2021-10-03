@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="no-margin absolute-right"
+      class="no-margin absolute-right non-selectable"
       style="left:90%;"
     >
       <q-btn

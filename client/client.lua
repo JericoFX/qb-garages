@@ -10,6 +10,7 @@ local DamageVeh = {}
 
 local function OpenMenu()
     QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
+        if type(Vehicles) == "table" then
         for k, v in ipairs(Vehicles) do
             if not cacheVeh[Vehicles[k].plate] then
                 cacheVeh[Vehicles[k].plate] = {}
@@ -26,6 +27,7 @@ local function OpenMenu()
             Garagelabel = Garages[CurrentGarage]["label"],
             type = "garage"
         })
+    end
     end, CurrentGarage)
 end
 
@@ -118,7 +120,6 @@ end)
 RegisterNUICallback("OutVehicle", function(data, cb)
     local Plate = data.plate
     local Type = data.type
-    print(Plate,Type)
     SpawnVehicle(Plate, function(message) 
         cb(message) 
     end, Type)
