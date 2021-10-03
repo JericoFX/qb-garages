@@ -30,7 +30,7 @@ CreateThread(function()
         --------------------------- OPEN THE MENU -----------------------------
         Zones[k].OpenMenu = BoxZone:Create(Garages[k].takeVehicle,4.2,4.2,{
             name=k,
-            debugPoly = true,
+            debugPoly = false,
             minZ = Garages[k].takeVehicle.z - 1,
             maxZ = Garages[k].takeVehicle.z +2
         })
