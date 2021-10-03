@@ -10,7 +10,7 @@ CreateThread(function()
             SpawnVehicle = {}
         }
         --------------------------- SAVE VEHICLE -----------------------------
-        Zones[k].PutVehicle = BoxZone:Create(Garages[k].putVehicle,Garages[k].length or 18.8,Garages[k].width or 18.8,{
+        Zones[k].PutVehicle = BoxZone:Create(Garages[k].putVehicle,Garages[k].length or 12.0,Garages[k].width or 12.0,{
             name=k,
             heading = Garages[k].heading,
             debugPoly = false,
@@ -28,9 +28,9 @@ CreateThread(function()
             end
         end)
         --------------------------- OPEN THE MENU -----------------------------
-        Zones[k].OpenMenu = BoxZone:Create(Garages[k].takeVehicle,3.0,5.0,{
+        Zones[k].OpenMenu = BoxZone:Create(Garages[k].takeVehicle,4.2,4.2,{
             name=k,
-            debugPoly = false,
+            debugPoly = true,
             minZ = Garages[k].takeVehicle.z - 1,
             maxZ = Garages[k].takeVehicle.z +2
         })
@@ -63,7 +63,7 @@ CreateThread(function()
         })
 
 
-        exports['qb-menu']:AddBoxZone(k,Zones[k].OpenMenu.startPos,3.0,5.0,{
+        exports['qb-menu']:AddBoxZone(k,Zones[k].OpenMenu.startPos,4.2,4.2,{
             name = k,
             heading = 13.1,
             debugPoly = false,
@@ -74,7 +74,7 @@ CreateThread(function()
                 {
                     type="header",
                     title = "Open Menu",
-                    description = "Press E to open the "..Garages[Zones[k].OpenMenu.name].label.." Garage"
+                    description = "Press E to open "..Garages[Zones[k].OpenMenu.name].label.." Garage"
                 }
             }
         })

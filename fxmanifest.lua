@@ -12,7 +12,7 @@ client_scripts {  '@PolyZone/client.lua',
 shared_script {'@qb-core/import.lua', 'config.lua'}
 
 server_script 'server/server.lua'
-
+this_is_a_map 'yes'
 files { -- Credits to https://github.com/LVRP-BEN/bl_coords for clipboard copy method
     'html/index.html', 'html/js/*.js', 'html/css/*.css', 'html/fonts/*.css',
     'html/icons/*.css'

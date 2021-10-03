@@ -1,7 +1,7 @@
 Garages = {
     ["motelgarage"] = {
         label = "Motel Parking",
-        takeVehicle = vector3(273.43, -343.99, 44.91),
+        takeVehicle = vector3(275.58, -344.6, 45.17),
         spawnPoint = vector4(270.94, -342.96, 43.97, 161.5),
         putVehicle = vector3(280.0, -337.0, 44.92),
         showBlip = true,
@@ -21,7 +21,7 @@ Garages = {
     },
     ["spanishave"] = {
         label = "Spanish Ave Parking",
-        takeVehicle = vector3(-1160.86, -741.41, 19.63),
+        takeVehicle = vector3(-1159.04, -739.77, 19.89),
         spawnPoint = vector4(-1163.88, -749.32, 18.42, 35.5),
         putVehicle = vector3(-1136.9, -750.75, 19.66),
         showBlip = true,
@@ -31,7 +31,7 @@ Garages = {
     },
     ["caears24"] = {
         label = "Caears 24 Parking",
-        takeVehicle = vector3(69.84, 12.6, 68.96),
+        takeVehicle = vector3(68.29, 12.52, 69.21),
         spawnPoint = vector4(73.21, 10.72, 68.83, 163.5),
         putVehicle = vector3(64.93, 22.66, 69.09),
         showBlip = true,
@@ -41,7 +41,7 @@ Garages = {
     },
     ["lagunapi"] = {
         label = "Laguna Parking",
-        takeVehicle = vector3(364.37, 297.83, 103.49),
+        takeVehicle = vector3(360.9, 298.94, 103.75),
         spawnPoint = vector4(367.49, 297.71, 103.43, 340.5),
         putVehicle = vector3(377.51, 279.03, 103.41),
         showBlip = true,
@@ -51,57 +51,63 @@ Garages = {
     },
     ["airportp"] = {
         label = "Airport Parking",
-        takeVehicle = vector3(-796.86, -2024.85, 8.88),
+        takeVehicle = vector3(-796.34, -2023.35, 9.17),
         spawnPoint = vector4(-800.41, -2016.53, 9.32, 48.5),
-        putVehicle = vector3(-804.84, -2023.21, 9.16),
+        putVehicle = vector3(-772.9, -2032.07, 8.88),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 30.0,
+        width = 32.8,
+        heading = 313
     },
     ["beachp"] = {
         label = "Beach Parking",
-        takeVehicle = vector3(-1183.1, -1511.11, 4.36),
+        takeVehicle = vector3(-1184.14, -1509.76, 4.65),
         spawnPoint = vector4(-1181.0, -1505.98, 4.37, 214.5),
-        putVehicle = vector3(-1176.81, -1498.63, 4.37),
+        putVehicle = vector3(-1187.97, -1488.45, 4.38),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 28.6,
+        width = 26.2,
+        heading = 307
     },
     ["themotorhotel"] = {
         label = "The Motor Hotel Parking",
-        takeVehicle = vector3(1137.77, 2663.54, 37.9),
+        takeVehicle = vector3(1133.03, 2666.11, 38.27),
         spawnPoint = vector4(1137.69, 2673.61, 37.9, 359.5),
-        putVehicle = vector3(1137.75, 2652.95, 37.9),
+        putVehicle = vector3(1125.76, 2651.06, 38.0),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 13,
+        width = 29.2,
+        heading = 359
     },
     ["liqourparking"] = {
         label = "Liqour Parking",
-        takeVehicle = vector3(934.95, 3606.59, 32.81),
+        takeVehicle = vector3(938.34, 3607.77, 33.13),
         spawnPoint = vector4(941.57, 3619.99, 32.5, 141.5),
-        putVehicle = vector3(939.37, 3612.25, 32.69),
+        putVehicle = vector3(947.39, 3619.06, 32.64),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 12.0,
+        width = 14,
+        heading = 0
     },
     ["shoreparking"] = {
         label = "Shore Parking",
-        takeVehicle = vector3(1726.21, 3707.16, 34.17),
+        takeVehicle = vector3(1718.22, 3718.31, 34.42),
         spawnPoint = vector4(1730.31, 3711.07, 34.2, 20.5),
-        putVehicle = vector3(1737.13, 3718.91, 34.04),
+        putVehicle = vector3(1736.01, 3720.98, 34.19),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 24.0,
+        width = 13,
+        heading = 21
     },
     ["haanparking"] = {
         label = "Bell Farms Parking",
-        takeVehicle = vector3(78.34, 6418.74, 31.28),
+        takeVehicle = vector3(83.77, 6420.17, 31.76),
         spawnPoint = vector4(70.71, 6425.16, 30.92, 68.5),
-        putVehicle = vector3(85.3, 6427.52, 31.33),
+        putVehicle = vector3(64.48, 6389.45, 31.23),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 36.8,
+        width = 32.2,
+        heading = 312
     },
     ["dumbogarage"] = {
         label = "Dumbo Private Parking",
@@ -109,16 +115,19 @@ Garages = {
         spawnPoint = vector4(165.32, -3236.10, 5.93, 268.5),
         putVehicle = vector3(165.32, -3230.00, 5.93),
         showBlip = true,
-        minZ = 0,
-        maxZ = 0
+        length = 36.8,
+        width = 32.2,
+        heading = 312
     },
     ["pillboxgarage"] = {
         label = "Pillbox Garage Parking",
-        takeVehicle = vector3(215.9499, -809.698, 30.731),
+        takeVehicle = vector3(213.2, -809.1, 31.01),
         spawnPoint = vector4(234.1942, -787.066, 30.193, 159.6),
-        putVehicle = vector3(214.44, -792.19, 30.85),
-       heading = 340,
-        showBlip = true
+        putVehicle = vector3(213.75, -794.61, 30.89),
+        showBlip = true,
+        length = 21.4,
+        width = 16.4,
+        heading = 338
     }
 
 }
