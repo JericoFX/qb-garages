@@ -13,7 +13,7 @@ CreateThread(function()
         Zones[k].PutVehicle = BoxZone:Create(Garages[k].putVehicle,25.0,17.0,{
             name=k,
             heading = 340,
-            debugPoly = true,
+            debugPoly = false,
             minZ = Garages[k].putVehicle.z - 1,
             maxZ = Garages[k].putVehicle.z + 2
         })
@@ -89,7 +89,7 @@ CreateThread(function()
         --------------------------- SAVE VEHICLE -----------------------------
         Zones[k].takeVehicle = BoxZone:Create(Depots[k].takeVehicle,5.0,8.0,{
             name=k,
-            debugPoly = true,
+            debugPoly = false,
             minZ = Depots[k].takeVehicle.z - 1,
             maxZ = Depots[k].takeVehicle.z + 2
         })
@@ -108,7 +108,7 @@ CreateThread(function()
         exports['qb-menu']:AddBoxZone(k,Zones[k].takeVehicle.startPos,3.0,5.0,{
             name = k,
             heading = 13.1,
-            debugPoly = true,
+            debugPoly = false,
             minZ = Depots[k].takeVehicle.z - 1,
             maxZ = Depots[k].takeVehicle.z + 2
         },{
