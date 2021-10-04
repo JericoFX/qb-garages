@@ -205,7 +205,7 @@ function SpawnVehicle(plate, cb, IsHouse)
         end
     elseif IsHouse == "garage" then
         print(Garages[CurrentGarage].label)
-        if IsPositionOccupied(Garages[CurrentGarage].putVehicle.x,Garages[CurrentGarage].putVehicle.y,Garages[CurrentGarage].putVehicle.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
+        if IsPositionOccupied(Garages[CurrentGarage].spawnPoint.x,Garages[CurrentGarage].spawnPoint.y,Garages[CurrentGarage].spawnPoint.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
             QBCore.Functions.Notify("There is a vehicle Blocking the spawnPoint","error")
             cb(false)
         else
