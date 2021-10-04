@@ -29,6 +29,7 @@ Please make sure to update tests as appropriate.
 
 * Impound Feature with ammount to pay and Note system (qb-impound coming soon)
 
+* Simplify the States , 0 is Out, 1 is in Garage and 2 is Impounded
 
 ## Bugs or TO-DO
 
