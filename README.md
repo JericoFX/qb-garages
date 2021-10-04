@@ -30,6 +30,20 @@ Please make sure to update tests as appropriate.
 * Impound Feature with ammount to pay and Note system (qb-impound coming soon)
 
 * Simplify the States , 0 is Out, 1 is in Garage and 2 is Impounded
+* Lang System (only english and spanish at the moment)
+* Dark and Light Mode
+
+## IMAGES
+
+![Hi](https://image.prntscr.com/image/1nsSqcOZRZGE3eAS1efZdA.png)
+![Hi](https://image.prntscr.com/image/60RersY_SZe8u3HTStT_-g.png)
+![Hi](https://image.prntscr.com/image/1SEoJP0hRbKIZ1XnSeWmIg.png)
+![Hi](https://image.prntscr.com/image/-3z-kSN5T-mWHemccLtapg.png)
+
+
+https://prnt.sc/1ut27yj
+
+https://prnt.sc/1ut29d0
 
 ## Bugs or TO-DO
 
