@@ -40,10 +40,39 @@ Please make sure to update tests as appropriate.
 ![Hi](https://image.prntscr.com/image/1SEoJP0hRbKIZ1XnSeWmIg.png)
 ![Hi](https://image.prntscr.com/image/-3z-kSN5T-mWHemccLtapg.png)
 
+## SQL
 
-https://prnt.sc/1ut27yj
+```sql
+CREATE TABLE `player_vehicles` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`license` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`citizenid` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`vehicle` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`hash` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`mods` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`plate` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`fakeplate` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`garage` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`fuel` INT(11) NULL DEFAULT '100',
+	`engine` FLOAT NULL DEFAULT '1000',
+	`body` FLOAT NULL DEFAULT '1000',
+	`state` INT(11) NULL DEFAULT '1',
+	`depotprice` INT(11) NOT NULL DEFAULT '0',
+	`drivingdistance` INT(50) NULL DEFAULT NULL,
+	`status` TEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`notes` LONGTEXT NULL DEFAULT 'No Message' COLLATE 'utf8_general_ci',
+	`pics` TEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `plate` (`plate`) USING BTREE,
+	INDEX `citizenid` (`citizenid`) USING BTREE,
+	INDEX `license` (`license`) USING BTREE
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=11
+;
 
-https://prnt.sc/1ut29d0
+```
 
 ## Bugs or TO-DO
 
