@@ -1,3 +1,4 @@
+
 <template>
   <q-item-section class="">
     <div class="text-h6 q-ml-xl">
@@ -23,7 +24,7 @@
           <q-card
             flat
             :dark="Plate"
-            :style="Url !== '' ? style : ''"
+            :style='Url2.length > 0 ? "max-width:1400px;width:100%" : "max-width:575px;width:100%"'
           >
             <q-card-section>
               <div class="text-h6">Notes</div>
@@ -37,12 +38,18 @@
                   width="1400px"
                   height="700px"
                 >
-                  <div class="absolute-bottom text-subtitle1 text-center">
-                    {{Notes}}
-                  </div>
+                  
                 </q-img>
               </div>
+             
             </q-card-section>
+
+             <q-card-section>
+              <div class="absolute-bottom text-subtitle1 text-center">
+                    {{Notes}}
+                  </div>
+              </q-card-section>
+
             <q-card-actions align="center">
               <q-btn
                 flat
@@ -69,7 +76,7 @@ export default {
 
   props: { notes: { type: String }, pics: {}, plate: { type: String } },
   setup (props) {
-     /* eslint-disable */
+    
     const Notes = props.notes
     const re = /"/g
     let Url = props.pics
@@ -77,6 +84,7 @@ export default {
     const Plate = inject("SetDark")
     const logthis = ref(false)
     const Store = useStore()
+
     const style = {
       maxWidth: '1660px',
       maxHeight: '876px'

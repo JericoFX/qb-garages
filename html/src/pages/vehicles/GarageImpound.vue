@@ -41,18 +41,25 @@
           />
 
           <Body :vehicleBody="veh.body" />
-          <q-separator
+           <q-separator
             spaced
             inset
             vertical
             :dark="SetDark"
           />
-
+  <div v-if="HasNote">
+     <q-separator
+            spaced
+            inset
+            vertical
+            :dark="SetDark"
+          />
           <Notes
             :notes="veh.notes"
             :pics="veh.pics"
             :plate="veh.plate"
           />
+            </div>
         </q-item>
         <q-card-actions
           vertical
@@ -176,6 +183,13 @@ export default {
       SetDark,
       IsOut,
       CheckForMoney,
+      HasNote: computed(() => {
+        if(!veh.notes === "" || !veh.notes === undefined || !veh.notes === null || veh.notes.length > 0){
+            return true
+        }else{
+          return false
+        }
+      })
     }
   }
 }

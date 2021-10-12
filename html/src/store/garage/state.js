@@ -1,7 +1,7 @@
 //import Data from '../../assets/Jerico.json'
 export default {
   Vehicles: null,
-  Impound: false,
+  Impound: true,
   GarageTitle: "",
   Url: "",
   Notes: "",
