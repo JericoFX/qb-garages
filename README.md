@@ -27,7 +27,7 @@ Please make sure to update tests as appropriate.
 
 * NUI Garages with Fuel,Engine,Body %
 
-* Impound Feature with ammount to pay and Note system (qb-impound coming soon)
+* Impound Feature with ammount to pay and Note system ( https://github.com/JericoFX/qb-impound )
 
 * Simplify the States , 0 is Out, 1 is in Garage and 2 is Impounded
 * Lang System (only english and spanish at the moment)
