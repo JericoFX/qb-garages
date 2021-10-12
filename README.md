@@ -83,6 +83,7 @@ AUTO_INCREMENT=11
 * Gangs doesn't work yet  //DONE
 * Save Damage
 * Migrate to PolyZone
+* At resource restart the vehicles doesnt go to Impound
 ```
 
 ## License
