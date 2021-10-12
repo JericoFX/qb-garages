@@ -89,3 +89,15 @@ RegisterServerEvent('qb-garage:server:GetImpounded', function(citizenid)
         end
     end
 end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+  if (GetCurrentResourceName() ~= resourceName) then
+    return
+  end
+    local Plate = exports.oxmysql:fetchSync('SELECT plate FROM player_vehicles WHERE state = 0') 
+         if Plate then
+            for k,v in pairs(Plate) do
+                local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET state = 2, garage = "'..Config.DefaultDepot..'" WHERE plate = ? ',{Plate[k].plate})
+            end
+         end
+end)
