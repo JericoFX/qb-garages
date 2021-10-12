@@ -1,3 +1,6 @@
+Config = {}
+Config.DefaultDepot =  "hayesdepot"
+
 Garages = {
     ["motelgarage"] = {
         label = "Motel Parking",

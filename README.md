@@ -82,7 +82,8 @@ AUTO_INCREMENT=11
 * Clear the Lua code
 * Gangs doesn't work yet  //DONE
 * Save Damage
-* Migrate to PolyZone
+* Migrate to PolyZone //DONE
+* At resource restart the vehicles doesnt go to Impound //FIXED
 ```
 
 ## License
