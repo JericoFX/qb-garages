@@ -58,6 +58,7 @@ import { inject, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
+import { SendNuiWithParams, SendNui, SendNuiReturning } from '../../utils/util.js'
 import axios from 'axios';
 export default {
   components: { Vehicle, Fuel, Engine, Body, Plate },
@@ -75,17 +76,26 @@ export default {
     }
   },
   setup (props) {
-     /* eslint-disable */
+    /* eslint-disable */
     const $q = useQuasar()
     const { locale, t } = useI18n({ useScope: 'global' })
     const Store = useStore()
     const type = computed(() => Store.getters['garage/GetType'])
 
     const DeleteVehicle = (plate) => {
-      
+
+
       axios.post('https://qb-garages/OutVehicle', JSON.stringify({ plate: plate, type: type.value })).then(function (Spawned) {
         if (Spawned.data) {
-          Noti()
+          $q.notify({
+            color: 'primary',
+            textColor: 'white',
+            icon: 'mdi-check-decagram',
+            message: t('out'),
+            position: 'right',
+            multiLine: true,
+            timeout: 2000
+          })
           Store.dispatch('garage/DeleteVeh', plate)
         } else {
           $q.notify({
@@ -97,52 +107,40 @@ export default {
             multiLine: true,
             timeout: 2000
           })
-
         }
       })
     }
-    const Noti = () => {
-      $q.notify({
-        color: 'primary',
-        textColor: 'white',
-        icon: 'mdi-check-decagram',
-        message: t('out'),
-        position: 'right',
-        multiLine: true,
-        timeout: 2000
-      })
-    }
-    const Notify = (plate) => {
-      $q.dialog({
-        title: 'Confirm',
-        style: "border: 2px solid black;color:black;",
-        message: t('sure', { plate: plate }),
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        DeleteVehicle(plate)
-      }).onCancel(() => {
-        // //console.log('>>>> Cancel')
-      }).onDismiss(() => {
-        // //console.log('I am triggered on both OK and Cancel')
-      })
-    }
-    const SetDark = inject("SetDark")
-    const veh = {
-      body: props.veh.body,
-      engine: props.veh.engine,
-      vehicle: props.veh.vehicle,
-      plate: props.veh.plate,
-      fuel: props.veh.fuel
-    }
-    return {
-      Notify,
-      veh,
-      SetDark,
-      DeleteVehicle
+      const Notify = (plate) => {
+        $q.dialog({
+          title: 'Confirm',
+          style: "border: 2px solid black;color:black;",
+          message: t('sure', { plate: plate }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          DeleteVehicle(plate)
+        }).onCancel(() => {
+          // //console.log('>>>> Cancel')
+        }).onDismiss(() => {
+          // //console.log('I am triggered on both OK and Cancel')
+        })
+      }
+      const SetDark = inject("SetDark")
+      const veh = {
+        body: props.veh.body,
+        engine: props.veh.engine,
+        vehicle: props.veh.vehicle,
+        plate: props.veh.plate,
+        fuel: props.veh.fuel
+      }
+      return {
+        Notify,
+        veh,
+        SetDark,
+        DeleteVehicle
+      }
     }
   }
-}
 </script>
 
 <style>

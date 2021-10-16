@@ -78,11 +78,7 @@ export default defineComponent({
 
     const Store = useStore()
 
-
-
-
     provide("SetDark", SetDark)
-
 
     function radio () {
       $q.dialog({
@@ -120,6 +116,7 @@ export default defineComponent({
 <style scoped>
 .vehbody {
   position: absolute;
+  max-width: 1237px;
   width: 1237px;
   height: 553px;
   left: 68px;

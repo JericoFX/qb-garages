@@ -147,7 +147,7 @@ function GetCarToGarage(plate, garage)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then
-                QBCore.Functions.Notify("Something is preventing the car to despawn")
+                QBCore.Functions.Notify("Something is preventing the car to despawn \n get everyone off the car")
                 return
             end
             if Vehicle then
@@ -157,16 +157,58 @@ function GetCarToGarage(plate, garage)
         end
     end, plate, Player)
 end
-
-function GetVehicleDamage(veh,Plate)
-if not  DamageVeh[Plate] then
-    DamageVeh[Plate] = {}
+-- https://github.com/renzuzu/renzu_garage BIG thanks to RENZU for let me grab this code
+function GetVehicleDamage(vehicle,plate)
+    if not  DamageVeh[plate] then
+        DamageVeh[plate] = {}
+    end
+   
+    DamageVeh[plate].wheel_tires = {}
+    DamageVeh[plate].vehicle_doors = {}
+    DamageVeh[plate].vehicle_window = {}
+        for tireid = 1, 7 do
+            local normal = IsVehicleTyreBurst(vehicle, tireid, true)
+            local completely = IsVehicleTyreBurst(vehicle, tireid, false)
+            if normal or completely then
+                DamageVeh[plate].wheel_tires[tireid] = true
+                
+            else
+                DamageVeh[plate].wheel_tires[tireid] = false
+            end
+        end
+        Wait(100)
+        for doorid = 0, 5 do
+            DamageVeh[plate].vehicle_doors[#DamageVeh[plate].vehicle_doors+1] = IsVehicleDoorDamaged(vehicle, doorid)
+        end
+        Wait(500)
+        for windowid = 0, 7 do
+            DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window+1] = IsVehicleWindowIntact(vehicle, windowid)
+        end
+        tPrint(DamageVeh[plate])
 end
 
-end
-
-function SetVehicleDamage(Vehicle,plate)
-
+function SetVehicleDamage(vehicle,mods)
+    if DamageVeh[mods.plate].wheel_tires then
+        for tireid = 1, 7 do
+            if DamageVeh[mods.plate].wheel_tires[tireid] ~= false then
+                SetVehicleTyreBurst(vehicle, tireid, true, 1000)
+            end
+        end
+    end
+    if DamageVeh[mods.plate].vehicle_window then
+        for windowid = 0, 5, 1 do
+            if DamageVeh[mods.plate].vehicle_window[windowid] ~= false then
+                RemoveVehicleWindow(vehicle, windowid)
+            end
+        end
+    end
+    if DamageVeh[mods.plate].vehicle_doors then
+        for doorid = 0, 5, 1 do
+            if DamageVeh[mods.plate].vehicle_doors[doorid] ~= false then
+                SetVehicleDoorBroken(vehicle, doorid-1, true)
+            end
+        end
+    end
 end
 
 
@@ -196,15 +238,15 @@ function SpawnVehicle(plate, cb, IsHouse)
                     exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                     TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                     TaskWarpPedIntoVehicle(ped, veh, -1)
-                    SetVehicleDamage(veh,plate)
+                    SetVehicleDamage(veh,mods)
                 end, plate)
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            DamageVeh[plate] = nil
             cb(true)
-
+           
         end
     elseif IsHouse == "garage" then
-        print(Garages[CurrentGarage].label)
         if IsPositionOccupied(Garages[CurrentGarage].spawnPoint.x,Garages[CurrentGarage].spawnPoint.y,Garages[CurrentGarage].spawnPoint.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
             QBCore.Functions.Notify("There is a vehicle Blocking the spawnPoint","error")
             cb(false)
@@ -216,11 +258,13 @@ function SpawnVehicle(plate, cb, IsHouse)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
- 
+                        SetVehicleDamage(veh,mods)
                     end, plate)
             end, Garages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            DamageVeh[plate] = nil
             cb(true)
+           
         end
     elseif IsHouse == "impound" then
         if IsPositionOccupied(Depots[CurrentGarage].takeVehicle.x,Depots[CurrentGarage].takeVehicle.y,Depots[CurrentGarage].takeVehicle.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
@@ -234,10 +278,11 @@ function SpawnVehicle(plate, cb, IsHouse)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskWarpPedIntoVehicle(ped, veh, -1)
- 
+                        SetVehicleDamage(veh,mods)
                     end, plate)
             end, Depots[CurrentGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            DamageVeh[plate] = nil
             cb(true)
         end
     elseif IsHouse == "gangs" then
@@ -252,10 +297,12 @@ function SpawnVehicle(plate, cb, IsHouse)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskWarpPedIntoVehicle(ped, veh, -1)
+                        SetVehicleDamage(veh,mods)
                     end, plate)
                     SetVehicleDamage(veh,plate)
             end, GangGarages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
+            DamageVeh[plate] = nil
             cb(true)
         end
     end

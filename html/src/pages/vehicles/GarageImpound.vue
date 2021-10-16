@@ -41,25 +41,25 @@
           />
 
           <Body :vehicleBody="veh.body" />
-           <q-separator
+          <q-separator
             spaced
             inset
             vertical
             :dark="SetDark"
           />
-  <div v-if="HasNote">
-     <q-separator
-            spaced
-            inset
-            vertical
-            :dark="SetDark"
-          />
-          <Notes
-            :notes="veh.notes"
-            :pics="veh.pics"
-            :plate="veh.plate"
-          />
-            </div>
+          <div v-if="HasNote">
+            <q-separator
+              spaced
+              inset
+              vertical
+              :dark="SetDark"
+            />
+            <Notes
+              :notes="veh.notes"
+              :pics="veh.pics"
+              :plate="veh.plate"
+            />
+          </div>
         </q-item>
         <q-card-actions
           vertical
@@ -92,10 +92,12 @@ import Engine from '../info/Engine.vue'
 import Body from '../info/Body.vue'
 import Plate from '../info/Plate.vue'
 import Notes from '../info/Notes.vue'
-import axios from 'axios'
-import { inject, ref, computed, onBeforeUnmount } from 'vue';
+
+import { SendNuiWithParams } from '../../utils/util'
+import { inject, ref, computed } from 'vue';
 import { useQuasar } from 'quasar'
 import { useStore } from 'vuex'
+import axios from 'axios';
 export default {
   components: { Vehicle, Fuel, Engine, Body, Plate, Notes },
   name: "GarageImpound",
@@ -114,18 +116,9 @@ export default {
     }
   },
   setup (props) {
- /* eslint-disable */
+    /* eslint-disable */
     const $q = useQuasar()
     const Store = useStore()
-    let timer
-
-    onBeforeUnmount(() => {
-      if (timer !== void 0) {
-        clearTimeout(timer)
-        $q.loading.hide()
-      }
-    })
-
 
     const IsOut = ref(false)
 
@@ -133,8 +126,7 @@ export default {
 
     const type = computed(() => Store.getters['garage/GetType'])
 
-    const CheckForMoney = (plate) => {
-      
+    const CheckForMoney = async (plate) => {
       axios.post('https://qb-garages/PayImpound').then(function (HasMoney) { // GETTING THE MONEY FROM THE PLAYER
         if (HasMoney.data) {
           $q.notify({
@@ -147,7 +139,7 @@ export default {
             timeout: 2000
           })
           Store.dispatch('garage/DeleteVeh', plate) //DELETING THE VEHICLE WITH THE PLATE....
-          axios.post('https://qb-garages/OutVehicle', JSON.stringify({ plate: plate, type: type.value })) // SENDING THE INFORMATION TO LUA
+          SendNuiWithParams('OutVehicle', { plate: plate, type: type.value })
         } else {
           $q.notify({
             color: 'primary',
@@ -160,11 +152,6 @@ export default {
           })
         }
       })
-
-
-
-
-   
     }
 
 
@@ -184,9 +171,9 @@ export default {
       IsOut,
       CheckForMoney,
       HasNote: computed(() => {
-        if(!veh.notes === "" || !veh.notes === undefined || !veh.notes === null || veh.notes.length > 0){
-            return true
-        }else{
+        if (!veh.notes === "" || !veh.notes === undefined || !veh.notes === null || veh.notes.length > 0) {
+          return true
+        } else {
           return false
         }
       })
