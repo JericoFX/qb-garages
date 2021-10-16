@@ -17,6 +17,8 @@ local function OpenMenu()
             end
             cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
             cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
+            cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
+            cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
         end
         SetNuiFocus(true, true)
         SendNUIMessage({
@@ -40,6 +42,8 @@ local function OpenHouseMenu()
                 end
                 cacheVeh[Cars[k].plate].vehicle = Cars[k].vehicle
                 cacheVeh[Cars[k].plate].fuel = Cars[k].fuel
+                cacheVeh[Cars[k].plate].body = Cars[k].body
+                cacheVeh[Cars[k].plate].engine = Cars[k].engine
             end
             SetNuiFocus(true, true)
             SendNUIMessage({
@@ -67,6 +71,8 @@ local function OpenDepotMenu()
                 end
                 cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
                 cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
+                cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
+                cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
             end
             SetNuiFocus(true, true)
             SendNUIMessage({
@@ -90,6 +96,8 @@ local function OpenGangMenu()
                 end
                 cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
                 cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
+                cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
+                cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
             end
             SetNuiFocus(true, true)
             SendNUIMessage({
@@ -159,13 +167,13 @@ function GetCarToGarage(plate, garage)
 end
 -- https://github.com/renzuzu/renzu_garage BIG thanks to RENZU for let me grab this code
 function GetVehicleDamage(vehicle,plate)
-    if not  DamageVeh[plate] then
-        DamageVeh[plate] = {}
+    if not DamageVeh[plate] then
+        DamageVeh[plate] = {
+            wheel_tires = {},
+            vehicle_doors = {},
+            vehicle_window = {}
+        }
     end
-   
-    DamageVeh[plate].wheel_tires = {}
-    DamageVeh[plate].vehicle_doors = {}
-    DamageVeh[plate].vehicle_window = {}
         for tireid = 1, 7 do
             local normal = IsVehicleTyreBurst(vehicle, tireid, true)
             local completely = IsVehicleTyreBurst(vehicle, tireid, false)
@@ -184,27 +192,28 @@ function GetVehicleDamage(vehicle,plate)
         for windowid = 0, 7 do
             DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window+1] = IsVehicleWindowIntact(vehicle, windowid)
         end
-        tPrint(DamageVeh[plate])
+  
+     
 end
 
-function SetVehicleDamage(vehicle,mods)
-    if DamageVeh[mods.plate].wheel_tires then
+function SetVehicleDamage(vehicle,mods,plate)
+    if DamageVeh[plate].wheel_tires then
         for tireid = 1, 7 do
-            if DamageVeh[mods.plate].wheel_tires[tireid] ~= false then
+            if DamageVeh[plate].wheel_tires[tireid] ~= false then
                 SetVehicleTyreBurst(vehicle, tireid, true, 1000)
             end
         end
     end
-    if DamageVeh[mods.plate].vehicle_window then
+    if DamageVeh[plate].vehicle_window then
         for windowid = 0, 5, 1 do
-            if DamageVeh[mods.plate].vehicle_window[windowid] ~= false then
+            if DamageVeh[plate].vehicle_window[windowid] ~= false then
                 RemoveVehicleWindow(vehicle, windowid)
             end
         end
     end
-    if DamageVeh[mods.plate].vehicle_doors then
+    if DamageVeh[plate].vehicle_doors then
         for doorid = 0, 5, 1 do
-            if DamageVeh[mods.plate].vehicle_doors[doorid] ~= false then
+            if DamageVeh[plate].vehicle_doors[doorid] ~= false then
                 SetVehicleDoorBroken(vehicle, doorid-1, true)
             end
         end
@@ -234,17 +243,19 @@ function SpawnVehicle(plate, cb, IsHouse)
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
                 QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                     QBCore.Functions.SetVehicleProperties(veh, mods)
+                    SetVehicleBodyHealth(veh, cacheVeh[plate].body)
+                    SetVehicleEngineHealth(veh, cacheVeh[plate].engine)
                     SetVehicleNumberPlateText(veh, plate)
                     exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                     TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                     TaskWarpPedIntoVehicle(ped, veh, -1)
-                    SetVehicleDamage(veh,mods)
+                    SetVehicleDamage(veh,mods,plate)
+                    
                 end, plate)
+                DamageVeh[plate] = nil
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-            DamageVeh[plate] = nil
             cb(true)
-           
         end
     elseif IsHouse == "garage" then
         if IsPositionOccupied(Garages[CurrentGarage].spawnPoint.x,Garages[CurrentGarage].spawnPoint.y,Garages[CurrentGarage].spawnPoint.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
@@ -254,15 +265,18 @@ function SpawnVehicle(plate, cb, IsHouse)
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
                     QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
                         QBCore.Functions.SetVehicleProperties(veh, mods)
+                       
                         SetVehicleNumberPlateText(veh, plate)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
-                        SetVehicleDamage(veh,mods)
+                        SetVehicleDamage(veh,mods,plate)
+                        Wait(500)
+                        DamageVeh[plate] = nil
                     end, plate)
             end, Garages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-            DamageVeh[plate] = nil
+           
             cb(true)
            
         end
@@ -278,11 +292,13 @@ function SpawnVehicle(plate, cb, IsHouse)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskWarpPedIntoVehicle(ped, veh, -1)
-                        SetVehicleDamage(veh,mods)
+                        SetVehicleDamage(veh,mods,plate)
+                        Wait(500)
+                        DamageVeh[plate] = nil
                     end, plate)
             end, Depots[CurrentGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-            DamageVeh[plate] = nil
+            
             cb(true)
         end
     elseif IsHouse == "gangs" then
@@ -297,12 +313,14 @@ function SpawnVehicle(plate, cb, IsHouse)
                         exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                         TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                         TaskWarpPedIntoVehicle(ped, veh, -1)
-                        SetVehicleDamage(veh,mods)
+                        SetVehicleDamage(veh,mods,plate)
+                        Wait(500)
+                        DamageVeh[plate] = nil
                     end, plate)
                   
             end, GangGarages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-            DamageVeh[plate] = nil
+           
             cb(true)
         end
     end
@@ -335,52 +353,6 @@ end)
 ---
 local isclose = false
 local isCloseToSave = false
----BLIPS AND 3D TEXT STUFF
--- CreateThread(function()
---     Wait(1000)
---     while true do
---         Wait(5)
---         local ped = PlayerPedId()
---         local pos = GetEntityCoords(ped)
---         local inGarageRange = false
---         for k, v in pairs(Garages) do
---             local takeDist = #(pos - vector3(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y, Garages[k].takeVehicle.z))
---             local saveDist = #(pos - vector3(Garages[k].putVehicle.x, Garages[k].putVehicle.y,Garages[k].putVehicle.z))
---             if takeDist <= 15 then
---                 inGarageRange = true
---                 DrawMarker(2, Garages[k].takeVehicle.x, Garages[k].takeVehicle.y, Garages[k].takeVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 200, 0,0, 222, false, false, false, true, false, false,false)
---                 if takeDist <= 1.5 then
---                     if not IsPedInAnyVehicle(ped) then
---                         QBCore.Functions.DrawText3D(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z + 0.5, '~g~E~w~ - Garage')
---                         currentGarage = k
---                         isclose = true
---                     end
---                 end
---                 if takeDist >= 2 then isclose = false end
---             end
-
---             ------------------SAVE VEHICLE
---             if saveDist <= 15 then
---                 inGarageRange = true
---                 DrawMarker(2, Garages[k].putVehicle.x, Garages[k].putVehicle.y,
---                     Garages[k].putVehicle.z, 0.0, 0.0, 0.0, 0.0, 0.0,
---                     0.0, 0.3, 0.2, 0.15, 200, 0, 0, 222, false, false,
---                     false, true, false, false, false)
---                 if saveDist <= 1.5 then
---                     if IsPedInAnyVehicle(ped) then
---                         QBCore.Functions.DrawText3D(Garages[k].putVehicle.x,Garages[k].putVehicle.y,Garages[k].putVehicle.z + 0.5, '~g~E~w~ - Garage')
---                         currentGarage = k
---                         isCloseToSave = true
---                     end
---                 end
---                 if saveDist >= 2 then isCloseToSave = false end
---             end
---         end
-
---         if not inGarageRange then Citizen.Wait(5000) end
---     end
-
--- end)
 
 Citizen.CreateThread(function()
     for k, v in pairs(Garages) do
