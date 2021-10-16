@@ -299,7 +299,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                         TaskWarpPedIntoVehicle(ped, veh, -1)
                         SetVehicleDamage(veh,mods)
                     end, plate)
-                    SetVehicleDamage(veh,plate)
+                  
             end, GangGarages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
             DamageVeh[plate] = nil
