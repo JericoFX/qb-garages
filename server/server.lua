@@ -21,6 +21,22 @@ QBCore.Functions.CreateCallback("qb-garages:server:GetVehicleProps",function(sou
     cb(properties)
 end)
 
+RegisterServerEvent('SaveWeelsDamage', function(Ta,plate)
+    if not Ta or not plate then
+        print("No Damage Detected ommiting ")
+        return
+    end
+
+    local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET damages = ? WHERE plate = ?  ',{json.encode(Ta),plate})
+end)
+
+QBCore.Functions.CreateCallback('qb-garages:server:ReturnDamage',function(source,cb,plate)
+
+    local result = exports.oxmysql:fetchSync('SELECT damages FROM player_vehicles WHERE plate = ?',{plate})
+    cb(json.decode(result[1].damages))
+end)
+
+
 RegisterNetEvent('qb-garages:server:SetVehicleProps',function(data,plate)
     local src = source
     local Engine = math.floor(data.engine + 0.5)
@@ -39,7 +55,6 @@ RegisterNetEvent('qb-garages:server:UpdateState', function(plate)
 end)
 
 RegisterNetEvent('qb-garages:server:SaveCar', function(garage,plate)
-    print(garage,plate)
     local Garage = tostring(garage)
     local Plate = tostring(plate)
     exports.oxmysql:execute('UPDATE player_vehicles SET state = 1, garage = ? WHERE plate = ?',{Garage, Plate})
@@ -58,7 +73,6 @@ QBCore.Functions.CreateCallback('qb-garages:server:HasMoney',function(source, cb
 end)
 
 QBCore.Functions.CreateCallback("qb-garages:server:GetHouseVehicles",function(source, cb, house)
-    print(house)
     local src = source
     local pData = QBCore.Functions.GetPlayer(src)
     exports.oxmysql:fetch('SELECT * FROM player_vehicles WHERE garage = ?', {house}, function(result)
@@ -108,3 +122,27 @@ AddEventHandler('onResourceStart', function(resourceName)
             end
          end
 end)
+
+
+function tPrint(tbl, indent)
+    indent = indent or 0
+    for k, v in pairs(tbl) do
+        local tblType = type(v)
+        local formatting = ("%s ^3%s:^0"):format(string.rep("  ", indent), k)
+
+        if tblType == "table" then
+            print(formatting)
+            tPrint(v, indent + 1)
+        elseif tblType == 'boolean' then
+            print(("%s^1 %s ^0"):format(formatting,v))
+        elseif tblType == "function" then
+            print(("%s^9 %s ^0"):format(formatting,v))
+        elseif tblType == 'number' then
+            print(("%s^5 %s ^0"):format(formatting,v))
+        elseif tblType == 'string' then
+            print(("%s ^2'%s' ^0"):format(formatting,v))
+        else
+            print(("%s^2 %s ^0"):format(formatting,v))
+        end
+    end
+end

@@ -27,6 +27,8 @@ Please make sure to update tests as appropriate.
 
 * NUI Garages with Fuel,Engine,Body %
 
+* Added the damage for wheels, windows, and tires
+
 * Impound Feature with ammount to pay and Note system ( https://github.com/JericoFX/qb-impound )
 
 * Simplify the States , 0 is Out, 1 is in Garage and 2 is Impounded
@@ -71,6 +73,9 @@ COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 AUTO_INCREMENT=11
 ;
+
+ALTER TABLE `player_vehicles`
+	CHANGE COLUMN `damages` `damages` LONGTEXT NULL DEFAULT '{"vehicle_window":[false,false,false,false,false,false,false,false],"wheel_tires":[false,false,false,false,false,false,false],"vehicle_doors":[false,false,false,false,false,false]}' COLLATE 'utf8_general_ci' AFTER `pics`;
 
 ```
 

@@ -6,30 +6,30 @@ local currentGarage = nil
 local OutsideVehicles = {}
 local PlayerGang = {}
 local show = false
-local DamageVeh = {}
+
 
 local function OpenMenu()
     QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",function(Vehicles)
         if type(Vehicles) == "table" then
-        for k, v in ipairs(Vehicles) do
-            if not cacheVeh[Vehicles[k].plate] then
-                cacheVeh[Vehicles[k].plate] = {}
+            for k, v in ipairs(Vehicles) do
+                if not cacheVeh[Vehicles[k].plate] then
+                    cacheVeh[Vehicles[k].plate] = {}
+                end
+                cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
+                cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
+                cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
+                cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
             end
-            cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
-            cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
-            cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
-            cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
+            SetNuiFocus(true, true)
+            SendNUIMessage({
+                show = not show,
+                Vehicles = Vehicles,
+                IsImpound = Garages[CurrentGarage]["impound"] or false,
+                garageType = currentGarage,
+                Garagelabel = Garages[CurrentGarage]["label"],
+                type = "garage"
+            })
         end
-        SetNuiFocus(true, true)
-        SendNUIMessage({
-            show = not show,
-            Vehicles = Vehicles,
-            IsImpound = Garages[CurrentGarage]["impound"] or false,
-            garageType = currentGarage,
-            Garagelabel = Garages[CurrentGarage]["label"],
-            type = "garage"
-        })
-    end
     end, CurrentGarage)
 end
 
@@ -128,8 +128,8 @@ end)
 RegisterNUICallback("OutVehicle", function(data, cb)
     local Plate = data.plate
     local Type = data.type
-    SpawnVehicle(Plate, function(message) 
-        cb(message) 
+    SpawnVehicle(Plate, function(message)
+        cb(message)
     end, Type)
 end)
 
@@ -138,87 +138,6 @@ RegisterNUICallback("PayImpound", function(data, cb)
         cb(hasMoney)
     end)
 end)
-
-
-
-function GetCarToGarage(plate, garage)
-    local Player = QBCore.Functions.GetPlayerData().citizenid
-    local OtherPlayer = PlayerPedId()
-    local Vehicle = GetVehiclePedIsIn(OtherPlayer)
-    local Engine = GetVehicleEngineHealth(Vehicle)
-    local Body = GetVehicleBodyHealth(Vehicle)
-
-    QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
-        if ID then
-            GetVehicleDamage(Vehicle,plate)
-            TriggerServerEvent("qb-garages:server:SetVehicleProps",{body=Body,engine=Engine},plate)
-            TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
-            Wait(2000)
-            if not AreAnyVehicleSeatsFree(Vehicle) then
-                QBCore.Functions.Notify("Something is preventing the car to despawn \n get everyone off the car")
-                return
-            end
-            if Vehicle then
-                TriggerServerEvent("qb-garages:server:SaveCar", garage, plate)
-                QBCore.Functions.DeleteVehicle(Vehicle)
-            end
-        end
-    end, plate, Player)
-end
--- https://github.com/renzuzu/renzu_garage BIG thanks to RENZU for let me grab this code
-function GetVehicleDamage(vehicle,plate)
-    if not DamageVeh[plate] then
-        DamageVeh[plate] = {
-            wheel_tires = {},
-            vehicle_doors = {},
-            vehicle_window = {}
-        }
-    end
-        for tireid = 1, 7 do
-            local normal = IsVehicleTyreBurst(vehicle, tireid, true)
-            local completely = IsVehicleTyreBurst(vehicle, tireid, false)
-            if normal or completely then
-                DamageVeh[plate].wheel_tires[tireid] = true
-                
-            else
-                DamageVeh[plate].wheel_tires[tireid] = false
-            end
-        end
-        Wait(100)
-        for doorid = 0, 5 do
-            DamageVeh[plate].vehicle_doors[#DamageVeh[plate].vehicle_doors+1] = IsVehicleDoorDamaged(vehicle, doorid)
-        end
-        Wait(500)
-        for windowid = 0, 7 do
-            DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window+1] = IsVehicleWindowIntact(vehicle, windowid)
-        end
-  
-     
-end
-
-function SetVehicleDamage(vehicle,mods,plate)
-    if DamageVeh[plate].wheel_tires then
-        for tireid = 1, 7 do
-            if DamageVeh[plate].wheel_tires[tireid] ~= false then
-                SetVehicleTyreBurst(vehicle, tireid, true, 1000)
-            end
-        end
-    end
-    if DamageVeh[plate].vehicle_window then
-        for windowid = 0, 5, 1 do
-            if DamageVeh[plate].vehicle_window[windowid] ~= false then
-                RemoveVehicleWindow(vehicle, windowid)
-            end
-        end
-    end
-    if DamageVeh[plate].vehicle_doors then
-        for doorid = 0, 5, 1 do
-            if DamageVeh[plate].vehicle_doors[doorid] ~= false then
-                SetVehicleDoorBroken(vehicle, doorid-1, true)
-            end
-        end
-    end
-end
 
 
 function SpawnVehicle(plate, cb, IsHouse)
@@ -250,7 +169,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                     TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
                     TaskWarpPedIntoVehicle(ped, veh, -1)
                     SetVehicleDamage(veh,mods,plate)
-                    
+
                 end, plate)
                 DamageVeh[plate] = nil
             end, HouseGarages[currentHouseGarage].takeVehicle, false)
@@ -263,22 +182,22 @@ function SpawnVehicle(plate, cb, IsHouse)
             cb(false)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
-                        QBCore.Functions.SetVehicleProperties(veh, mods)
-                       
-                        SetVehicleNumberPlateText(veh, plate)
-                        exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                        TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
-                        TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
-                        SetVehicleDamage(veh,mods,plate)
-                        Wait(500)
-                        DamageVeh[plate] = nil
-                    end, plate)
+                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.SetVehicleProperties(veh, mods)
+
+                    SetVehicleNumberPlateText(veh, plate)
+                    exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
+                    TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
+                    TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
+                    SetVehicleDamage(veh,mods,plate)
+                    Wait(500)
+                    DamageVeh[plate] = nil
+                end, plate)
             end, Garages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-           
+
             cb(true)
-           
+
         end
     elseif IsHouse == "impound" then
         if IsPositionOccupied(Depots[CurrentGarage].takeVehicle.x,Depots[CurrentGarage].takeVehicle.y,Depots[CurrentGarage].takeVehicle.z, 10, false,true, false, 0, 0, 0, 0) == 1 then
@@ -286,19 +205,19 @@ function SpawnVehicle(plate, cb, IsHouse)
             cb(false)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
-                        QBCore.Functions.SetVehicleProperties(veh, mods)
-                        SetVehicleNumberPlateText(veh, plate)
-                        exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                        TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
-                        TaskWarpPedIntoVehicle(ped, veh, -1)
-                        SetVehicleDamage(veh,mods,plate)
-                        Wait(500)
-                        DamageVeh[plate] = nil
-                    end, plate)
+                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.SetVehicleProperties(veh, mods)
+                    SetVehicleNumberPlateText(veh, plate)
+                    exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
+                    TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
+                    TaskWarpPedIntoVehicle(ped, veh, -1)
+                    SetVehicleDamage(veh,mods,plate)
+                    Wait(500)
+                    DamageVeh[plate] = nil
+                end, plate)
             end, Depots[CurrentGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-            
+
             cb(true)
         end
     elseif IsHouse == "gangs" then
@@ -307,20 +226,20 @@ function SpawnVehicle(plate, cb, IsHouse)
             cb(false)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle, function(veh)
-                    QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
-                        QBCore.Functions.SetVehicleProperties(veh, mods)
-                        SetVehicleNumberPlateText(veh, plate)
-                        exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                        TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
-                        TaskWarpPedIntoVehicle(ped, veh, -1)
-                        SetVehicleDamage(veh,mods,plate)
-                        Wait(500)
-                        DamageVeh[plate] = nil
-                    end, plate)
-                  
+                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.SetVehicleProperties(veh, mods)
+                    SetVehicleNumberPlateText(veh, plate)
+                    exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
+                    TriggerEvent("vehiclekeys:client:SetOwner",GetVehicleNumberPlateText(veh))
+                    TaskWarpPedIntoVehicle(ped, veh, -1)
+                    SetVehicleDamage(veh,mods,plate)
+                    Wait(500)
+                    DamageVeh[plate] = nil
+                end, plate)
+
             end, GangGarages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
-           
+
             cb(true)
         end
     end
@@ -354,37 +273,7 @@ end)
 local isclose = false
 local isCloseToSave = false
 
-Citizen.CreateThread(function()
-    for k, v in pairs(Garages) do
-        if v.showBlip then
-            local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z)
-            SetBlipSprite(Garage, 357)
-            SetBlipDisplay(Garage, 4)
-            SetBlipScale(Garage, 0.65)
-            SetBlipAsShortRange(Garage, true)
-            SetBlipColour(Garage, 3)
-            BeginTextCommandSetBlipName("STRING")
-            AddTextComponentSubstringPlayerName(Garages[k].label)
-            EndTextCommandSetBlipName(Garage)
-        end
-    end
 
-    for k, v in pairs(Depots) do
-        if v.showBlip then
-            local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,Depots[k].takeVehicle.y,Depots[k].takeVehicle.z)
-            SetBlipSprite(Depot, 68)
-            SetBlipDisplay(Depot, 4)
-            SetBlipScale(Depot, 0.7)
-            SetBlipAsShortRange(Depot, true)
-            SetBlipColour(Depot, 5)
-
-            BeginTextCommandSetBlipName("STRING")
-            AddTextComponentSubstringPlayerName(Depots[k].label)
-            EndTextCommandSetBlipName(Depot)
-        end
-    end
-
-end)
 RegisterKeyMapping('OpenMenu', 'Open The menu on Garage', 'keyboard', 'e')
 local isInHouse = false
 RegisterCommand('OpenMenu', function()
@@ -432,19 +321,19 @@ CreateThread(function()
                             QBCore.Functions.DrawText3D(HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z +
                                 0.5, '~g~E~w~ - Garage ' ..
                                 HouseGarages[currentHouseGarage].label)
-                                isInHouse = true
+                            isInHouse = true
 
                         elseif IsPedInAnyVehicle(ped) then
                             QBCore.Functions.DrawText3D(HouseGarages[currentHouseGarage].takeVehicle.x,HouseGarages[currentHouseGarage].takeVehicle.y,HouseGarages[currentHouseGarage].takeVehicle.z +
                                 0.5, '~g~E~w~ - To Park')
-                                isInHouse = false
-                                InsideSaveHouse = true
-                            end
+                            isInHouse = false
+                            InsideSaveHouse = true
+                        end
 
                     end
 
-                    if takeDist > 1.99 then 
-                        takeDist = nil 
+                    if takeDist > 1.99 then
+                        takeDist = nil
                         InsideSaveHouse = false
                         isInHouse = false
                     end
@@ -455,26 +344,3 @@ CreateThread(function()
         if not inGarageRange then Citizen.Wait(5000) end
     end
 end)
-
-function tPrint(tbl, indent)
-    indent = indent or 0
-    for k, v in pairs(tbl) do
-        local tblType = type(v)
-        local formatting = ("%s ^3%s:^0"):format(string.rep("  ", indent), k)
-
-        if tblType == "table" then
-            print(formatting)
-            tPrint(v, indent + 1)
-        elseif tblType == 'boolean' then
-            print(("%s^1 %s ^0"):format(formatting,v))
-        elseif tblType == "function" then
-            print(("%s^9 %s ^0"):format(formatting,v))
-        elseif tblType == 'number' then
-            print(("%s^5 %s ^0"):format(formatting,v))
-        elseif tblType == 'string' then
-            print(("%s ^2'%s' ^0"):format(formatting,v))
-        else
-            print(("%s^2 %s ^0"):format(formatting,v))
-        end
-    end
-end
