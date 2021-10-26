@@ -10,26 +10,26 @@ function tPrint(tbl, indent)
             print(formatting)
             tPrint(v, indent + 1)
         elseif tblType == 'boolean' then
-            print(("%s^1 %s ^0"):format(formatting,v))
+            print(("%s^1 %s ^0"):format(formatting, v))
         elseif tblType == "function" then
-            print(("%s^9 %s ^0"):format(formatting,v))
+            print(("%s^9 %s ^0"):format(formatting, v))
         elseif tblType == 'number' then
-            print(("%s^5 %s ^0"):format(formatting,v))
+            print(("%s^5 %s ^0"):format(formatting, v))
         elseif tblType == 'string' then
-            print(("%s ^2'%s' ^0"):format(formatting,v))
+            print(("%s ^2'%s' ^0"):format(formatting, v))
         else
-            print(("%s^2 %s ^0"):format(formatting,v))
+            print(("%s^2 %s ^0"):format(formatting, v))
         end
     end
 end
-
---///////--
-
+-- ///////--
 
 Citizen.CreateThread(function()
     for k, v in pairs(Garages) do
         if v.showBlip then
-            local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,Garages[k].takeVehicle.y,Garages[k].takeVehicle.z)
+            local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,
+                                           Garages[k].takeVehicle.y,
+                                           Garages[k].takeVehicle.z)
             SetBlipSprite(Garage, 357)
             SetBlipDisplay(Garage, 4)
             SetBlipScale(Garage, 0.65)
@@ -43,7 +43,9 @@ Citizen.CreateThread(function()
 
     for k, v in pairs(Depots) do
         if v.showBlip then
-            local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,Depots[k].takeVehicle.y,Depots[k].takeVehicle.z)
+            local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,
+                                          Depots[k].takeVehicle.y,
+                                          Depots[k].takeVehicle.z)
             SetBlipSprite(Depot, 68)
             SetBlipDisplay(Depot, 4)
             SetBlipScale(Depot, 0.7)
@@ -58,8 +60,7 @@ Citizen.CreateThread(function()
 
 end)
 
-
-function GetVehicleDamage(vehicle,plate)
+function GetVehicleDamage(vehicle, plate)
     if not DamageVeh[plate] then
         DamageVeh[plate] = {
             wheel_tires = {},
@@ -79,29 +80,32 @@ function GetVehicleDamage(vehicle,plate)
     end
     Wait(100)
     for doorid = 0, 5 do
-        DamageVeh[plate].vehicle_doors[#DamageVeh[plate].vehicle_doors+1] = IsVehicleDoorDamaged(vehicle, doorid)
+        DamageVeh[plate].vehicle_doors[#DamageVeh[plate].vehicle_doors + 1] =
+            IsVehicleDoorDamaged(vehicle, doorid)
     end
     Wait(500)
     for windowid = 0, 7 do
-        DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window+1] = IsVehicleWindowIntact(vehicle, windowid)
+        DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window + 1] =
+            IsVehicleWindowIntact(vehicle, windowid)
     end
-    TriggerServerEvent("SaveWeelsDamage",DamageVeh[plate],plate)
+    TriggerServerEvent("SaveWeelsDamage", DamageVeh[plate], plate)
 end
 
-function SetVehicleDamage(vehicle,mods,plate)
+function SetVehicleDamage(vehicle, mods, plate)
     if not DamageVeh[plate] then
         DamageVeh[plate] = {
             wheel_tires = {},
             vehicle_doors = {},
             vehicle_window = {}
-        }  -- if the table is empty, fill the data from the database
-        QBCore.Functions.TriggerCallback("qb-garages:server:ReturnDamage",function(Damage)
+        } -- if the table is empty, fill the data from the database
+        QBCore.Functions.TriggerCallback("qb-garages:server:ReturnDamage",
+                                         function(Damage)
             if Damage then
                 DamageVeh[plate].wheel_tires = Damage.wheel_tires
                 DamageVeh[plate].vehicle_window = Damage.vehicle_window
                 DamageVeh[plate].vehicle_doors = Damage.vehicle_doors
             end
-        end,plate)
+        end, plate)
     end
     Wait(200)
     if DamageVeh[plate].wheel_tires then
@@ -121,7 +125,7 @@ function SetVehicleDamage(vehicle,mods,plate)
     if DamageVeh[plate].vehicle_doors then
         for doorid = 0, 5, 1 do
             if DamageVeh[plate].vehicle_doors[doorid] ~= false then
-                SetVehicleDoorBroken(vehicle, doorid-1, true)
+                SetVehicleDoorBroken(vehicle, doorid - 1, true)
             end
         end
     end
@@ -139,12 +143,14 @@ function GetCarToGarage(plate, garage)
 
     QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
         if ID then
-            GetVehicleDamage(Vehicle,plate)
-            TriggerServerEvent("qb-garages:server:SetVehicleProps",{body=Body,engine=Engine},plate)
+            GetVehicleDamage(Vehicle, plate)
+            TriggerServerEvent("qb-garages:server:SetVehicleProps",
+                               {body = Body, engine = Engine}, plate)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then
-                QBCore.Functions.Notify("Something is preventing the car to despawn \n get everyone off the car")
+                QBCore.Functions.Notify(
+                    "Something is preventing the car to despawn \n get everyone off the car")
                 return
             end
             if Vehicle then
