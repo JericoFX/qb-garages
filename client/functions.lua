@@ -1,5 +1,5 @@
 local DamageVeh = {}
-
+local QBCore = exports['qb-core']:GetCoreObject()
 function tPrint(tbl, indent)
     indent = indent or 0
     for k, v in pairs(tbl) do
@@ -88,7 +88,11 @@ function GetVehicleDamage(vehicle, plate)
         DamageVeh[plate].vehicle_window[#DamageVeh[plate].vehicle_window + 1] =
             IsVehicleWindowIntact(vehicle, windowid)
     end
-    TriggerServerEvent("SaveWeelsDamage", DamageVeh[plate], plate)
+    if Config.UsingSQL then
+        TriggerServerEvent("SaveWeelsDamage", DamageVeh[plate], plate)
+    else
+        SetResourceKvp(plate, json.encode(DamageVeh[plate])) 
+    end
 end
 
 function SetVehicleDamage(vehicle, mods, plate)
@@ -98,6 +102,7 @@ function SetVehicleDamage(vehicle, mods, plate)
             vehicle_doors = {},
             vehicle_window = {}
         } -- if the table is empty, fill the data from the database
+        if Config.UsingSQL then
         QBCore.Functions.TriggerCallback("qb-garages:server:ReturnDamage",
                                          function(Damage)
             if Damage then
@@ -106,6 +111,14 @@ function SetVehicleDamage(vehicle, mods, plate)
                 DamageVeh[plate].vehicle_doors = Damage.vehicle_doors
             end
         end, plate)
+    else
+        local Data = json.decode(GetResourceKvpString(plate))
+        if Data then
+            DamageVeh[plate].wheel_tires = Data.wheel_tires
+            DamageVeh[plate].vehicle_doors = Data.vehicle_doors
+            DamageVeh[plate].vehicle_window = Data.vehicle_window
+        end
+    end
     end
     Wait(200)
     if DamageVeh[plate].wheel_tires then

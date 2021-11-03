@@ -10,12 +10,7 @@ export function ChangeImpoundState (context, payload) {
 export function SetVehicles (context, payload) {
   context.commit('SetVehicles', payload)
 }
-export function SetNotes (context, payload) {
-  context.commit('SetNotes', payload)
-}
-export function SetUrl (context, payload) {
-  context.commit('SetUrl', payload)
-}
+
 export function SetType (context, payload) {
   context.commit('SetType', payload)
 }

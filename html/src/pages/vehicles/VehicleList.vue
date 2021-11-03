@@ -30,9 +30,7 @@ export default {
       fuel: 0,
       vehicle: 0,
       plate: 0,
-      engine: 0,
-      notes: "",
-      pics: ""
+      engine: 0
     }
   },
   setup (props) {
@@ -42,9 +40,7 @@ export default {
       engine: props.veh.engine,
       vehicle: props.veh.vehicle,
       plate: props.veh.plate,
-      fuel: props.veh.fuel,
-      notes: props.veh.notes,
-      pics: props.veh.pics
+      fuel: props.veh.fuel
     }
     const Store = useStore()
     const SetDark = inject("SetDark")

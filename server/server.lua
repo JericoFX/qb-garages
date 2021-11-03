@@ -1,4 +1,6 @@
+local QBCore = exports['qb-core']:GetCoreObject()
 local CacheInfo = {}
+
 QBCore.Functions.CreateCallback("qb-garages:server:GetVehicles",function(source, cb, garage)
     local Player = QBCore.Functions.GetPlayer(source)
     local GetVehicles = exports.oxmysql:fetchSync("SELECT * FROM player_vehicles WHERE citizenid = ? AND garage = ?",{Player.PlayerData.citizenid, garage})
@@ -64,7 +66,7 @@ QBCore.Functions.CreateCallback('qb-garages:server:HasMoney',function(source, cb
     local Player = QBCore.Functions.GetPlayer(source)
     local Money = Player.PlayerData.money.cash
     if Money >= 2000 then
-        Player.Functions.RemoveMoney("cash",2000,'Pay Impound')
+        Player.Functions.RemoveMoney("cash",Config.ImpoundMoney,'Pay Impound')
         cb(true)
     else
         cb(false)

@@ -47,19 +47,7 @@
             vertical
             :dark="SetDark"
           />
-          <div v-if="HasNote">
-            <q-separator
-              spaced
-              inset
-              vertical
-              :dark="SetDark"
-            />
-            <Notes
-              :notes="veh.notes"
-              :pics="veh.pics"
-              :plate="veh.plate"
-            />
-          </div>
+          
         </q-item>
         <q-card-actions
           vertical
@@ -91,7 +79,6 @@ import Fuel from '../info/Fuel.vue'
 import Engine from '../info/Engine.vue'
 import Body from '../info/Body.vue'
 import Plate from '../info/Plate.vue'
-import Notes from '../info/Notes.vue'
 
 import { SendNuiWithParams } from '../../utils/util'
 import { inject, ref, computed } from 'vue';
@@ -99,7 +86,7 @@ import { useQuasar } from 'quasar'
 import { useStore } from 'vuex'
 import axios from 'axios';
 export default {
-  components: { Vehicle, Fuel, Engine, Body, Plate, Notes },
+  components: { Vehicle, Fuel, Engine, Body, Plate },
   name: "GarageImpound",
   props: {
     veh: {
@@ -108,8 +95,6 @@ export default {
       vehicle: 0,
       plate: 0,
       engine: 0,
-      notes: "",
-      pics: ""
     },
     SetDark: {
       type: Boolean
@@ -160,23 +145,14 @@ export default {
       engine: props.veh.engine,
       vehicle: props.veh.vehicle,
       plate: props.veh.plate,
-      fuel: props.veh.fuel,
-      notes: props.veh.notes,
-      pics: props.veh.pics
+      fuel: props.veh.fuel
     }
 
     return {
       veh,
       SetDark,
       IsOut,
-      CheckForMoney,
-      HasNote: computed(() => {
-        if (!veh.notes === "" || !veh.notes === undefined || !veh.notes === null || veh.notes.length > 0) {
-          return true
-        } else {
-          return false
-        }
-      })
+      CheckForMoney
     }
   }
 }

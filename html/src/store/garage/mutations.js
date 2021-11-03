@@ -10,12 +10,6 @@ export function ChangeImpoundState (state, name) {
 export function SetVehicles (state, name) {
   state.Vehicles = name
 }
-export function SetNotes (state, name) {
-  state.Notes = name
-}
-export function SetUrl (state, name) {
-  state.Url = state.Url.push(name)
-}
 export function SetType (state, name) {
   state.type = name
 }

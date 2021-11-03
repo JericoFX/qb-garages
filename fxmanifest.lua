@@ -2,18 +2,19 @@ fx_version 'cerulean'
 game 'gta5'
 
 description 'FX GARAGE'
-version '1.0.0'
+version '1.0.2'
 author 'JericoFX'
 ui_page 'html/index.html'
 
-client_scripts {  '@PolyZone/client.lua',
-'@PolyZone/BoxZone.lua','client/functions.lua','client/zones.lua','client/client.lua'}
+client_scripts {
+    'GaragesConfig.lua', 'client/functions.lua',
+    'client/client.lua'
+}
 
-shared_script {'@qb-core/import.lua', 'config.lua'}
+shared_script 'config.lua'
 
-server_script 'server/server.lua'
-this_is_a_map 'yes'
-files { -- Credits to https://github.com/LVRP-BEN/bl_coords for clipboard copy method
+server_scripts {'GaragesConfig.lua','server/server.lua'}
+files {
     'html/index.html', 'html/js/*.js', 'html/css/*.css', 'html/fonts/*.css',
     'html/icons/*.css'
 }

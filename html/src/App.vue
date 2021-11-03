@@ -12,7 +12,7 @@
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios'
-import Data1 from './assets/Jerico.json'
+//import Data1 from './assets/Jerico.json'
 import {IS_DEV,IS_IMPOUND} from './utils/config'
 export default defineComponent({
   name: 'App',
