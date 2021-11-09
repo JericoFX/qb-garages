@@ -191,7 +191,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskWarpPedIntoVehicle(ped, veh, -1)
-                            SetVehicleDamage(veh, mods, plate)
+                            SetVehicleDamage(veh, plate)
 
                         end, plate)
                     DamageVeh[plate] = nil
@@ -219,7 +219,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
-                            SetVehicleDamage(veh, mods, plate)
+                            SetVehicleDamage(veh, plate)
                             Wait(500)
                             DamageVeh[plate] = nil
                         end, plate)
@@ -248,7 +248,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskWarpPedIntoVehicle(ped, veh, -1)
-                            SetVehicleDamage(veh, mods, plate)
+                            SetVehicleDamage(veh, plate)
                             Wait(500)
                             DamageVeh[plate] = nil
                         end, plate)
@@ -276,7 +276,7 @@ function SpawnVehicle(plate, cb, IsHouse)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskWarpPedIntoVehicle(ped, veh, -1)
-                            SetVehicleDamage(veh, mods, plate)
+                            SetVehicleDamage(veh,  plate)
                             Wait(500)
                             DamageVeh[plate] = nil
                         end, plate)
