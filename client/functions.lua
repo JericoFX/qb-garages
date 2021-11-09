@@ -28,8 +28,8 @@ Citizen.CreateThread(function()
     for k, v in pairs(Garages) do
         if v.showBlip then
             local Garage = AddBlipForCoord(Garages[k].takeVehicle.x,
-                                           Garages[k].takeVehicle.y,
-                                           Garages[k].takeVehicle.z)
+                Garages[k].takeVehicle.y,
+                Garages[k].takeVehicle.z)
             SetBlipSprite(Garage, 357)
             SetBlipDisplay(Garage, 4)
             SetBlipScale(Garage, 0.65)
@@ -44,8 +44,8 @@ Citizen.CreateThread(function()
     for k, v in pairs(Depots) do
         if v.showBlip then
             local Depot = AddBlipForCoord(Depots[k].takeVehicle.x,
-                                          Depots[k].takeVehicle.y,
-                                          Depots[k].takeVehicle.z)
+                Depots[k].takeVehicle.y,
+                Depots[k].takeVehicle.z)
             SetBlipSprite(Depot, 68)
             SetBlipDisplay(Depot, 4)
             SetBlipScale(Depot, 0.7)
@@ -63,10 +63,11 @@ end)
 function GetVehicleDamage(vehicle, plate)
     if not DamageVeh[plate] then
         DamageVeh[plate] = {
-            wheel_tires = {},
-            vehicle_doors = {},
-            vehicle_window = {}
+            wheel_tires = {false,false,false,false,false,false,false},
+            vehicle_doors = {false,false,false,false,false,false},
+            vehicle_window = {false,false,false,false,false,false}
         }
+
     end
     for tireid = 1, 7 do
         local normal = IsVehicleTyreBurst(vehicle, tireid, true)
@@ -91,34 +92,34 @@ function GetVehicleDamage(vehicle, plate)
     if Config.UsingSQL then
         TriggerServerEvent("SaveWeelsDamage", DamageVeh[plate], plate)
     else
-        SetResourceKvp(plate, json.encode(DamageVeh[plate])) 
+        SetResourceKvp(plate, json.encode(DamageVeh[plate]))
     end
 end
 
-function SetVehicleDamage(vehicle, mods, plate)
+function SetVehicleDamage(vehicle, plate)
     if not DamageVeh[plate] then
-        DamageVeh[plate] = {
-            wheel_tires = {},
-            vehicle_doors = {},
-            vehicle_window = {}
+          DamageVeh[plate] = {
+            wheel_tires = {false,false,false,false,false,false,false},
+            vehicle_doors = {false,false,false,false,false,false},
+            vehicle_window = {false,false,false,false,false,false}
         } -- if the table is empty, fill the data from the database
         if Config.UsingSQL then
-        QBCore.Functions.TriggerCallback("qb-garages:server:ReturnDamage",
-                                         function(Damage)
-            if Damage then
-                DamageVeh[plate].wheel_tires = Damage.wheel_tires
-                DamageVeh[plate].vehicle_window = Damage.vehicle_window
-                DamageVeh[plate].vehicle_doors = Damage.vehicle_doors
+            QBCore.Functions.TriggerCallback("qb-garages:server:ReturnDamage",
+                function(Damage)
+                    if Damage then
+                        DamageVeh[plate].wheel_tires = Damage.wheel_tires
+                        DamageVeh[plate].vehicle_window = Damage.vehicle_window
+                        DamageVeh[plate].vehicle_doors = Damage.vehicle_doors
+                    end
+                end, plate)
+        else
+            local Data = json.decode(GetResourceKvpString(plate))
+            if Data then
+                DamageVeh[plate].wheel_tires = Data.wheel_tires
+                DamageVeh[plate].vehicle_doors = Data.vehicle_doors
+                DamageVeh[plate].vehicle_window = Data.vehicle_window
             end
-        end, plate)
-    else
-        local Data = json.decode(GetResourceKvpString(plate))
-        if Data then
-            DamageVeh[plate].wheel_tires = Data.wheel_tires
-            DamageVeh[plate].vehicle_doors = Data.vehicle_doors
-            DamageVeh[plate].vehicle_window = Data.vehicle_window
         end
-    end
     end
     Wait(200)
     if DamageVeh[plate].wheel_tires then
@@ -158,7 +159,7 @@ function GetCarToGarage(plate, garage)
         if ID then
             GetVehicleDamage(Vehicle, plate)
             TriggerServerEvent("qb-garages:server:SetVehicleProps",
-                               {body = Body, engine = Engine}, plate)
+                {body = Body, engine = Engine}, plate)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then
