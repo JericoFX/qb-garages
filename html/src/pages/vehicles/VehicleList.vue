@@ -34,14 +34,15 @@ export default {
     }
   },
   setup (props) {
-     /* eslint-disable */
+const {fuelLevel,engineHealth,bodyHealth} = JSON.parse(props.veh.mods)
     const veh = {
-      body: props.veh.body,
-      engine: props.veh.engine,
+      body: Math.round(bodyHealth),
+      engine: Math.round(engineHealth),
       vehicle: props.veh.vehicle,
       plate: props.veh.plate,
-      fuel: props.veh.fuel
+      fuel: Math.round(fuelLevel)
     }
+   
     const Store = useStore()
     const SetDark = inject("SetDark")
     return {

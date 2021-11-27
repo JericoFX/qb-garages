@@ -129,6 +129,7 @@ function SetVehicleDamage(vehicle, plate)
             end
         end
     end
+    Wait(200)
     if DamageVeh[plate].vehicle_window then
         for windowid = 0, 5, 1 do
             if DamageVeh[plate].vehicle_window[windowid] ~= false then
@@ -136,6 +137,7 @@ function SetVehicleDamage(vehicle, plate)
             end
         end
     end
+    Wait(200)
     if DamageVeh[plate].vehicle_doors then
         for doorid = 0, 5, 1 do
             if DamageVeh[plate].vehicle_doors[doorid] ~= false then
@@ -154,12 +156,13 @@ function GetCarToGarage(plate, garage)
     local Vehicle = GetVehiclePedIsIn(OtherPlayer)
     local Engine = GetVehicleEngineHealth(Vehicle)
     local Body = GetVehicleBodyHealth(Vehicle)
+    local Fuel =  exports['LegacyFuel']:GetFuel(Vehicle)
 
     QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
         if ID then
             GetVehicleDamage(Vehicle, plate)
             TriggerServerEvent("qb-garages:server:SetVehicleProps",
-                {body = Body, engine = Engine}, plate)
+                {body = Body, engine = Engine,fuel = Fuel}, plate)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then

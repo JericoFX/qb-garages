@@ -28,13 +28,15 @@ local function OpenMenu()
         function(Vehicles)
             if type(Vehicles) == "table" then
                 for k, v in ipairs(Vehicles) do
+                    local Mods = json.decode(Vehicles[k].mods)
                     if not cacheVeh[Vehicles[k].plate] then
                         cacheVeh[Vehicles[k].plate] = {}
                     end
                     cacheVeh[Vehicles[k].plate].vehicle = Vehicles[k].vehicle
-                    cacheVeh[Vehicles[k].plate].fuel = Vehicles[k].fuel
-                    cacheVeh[Vehicles[k].plate].body = Vehicles[k].body
-                    cacheVeh[Vehicles[k].plate].engine = Vehicles[k].engine
+                    cacheVeh[Vehicles[k].plate].fuel = Mods.fuelLevel
+                    cacheVeh[Vehicles[k].plate].body = Mods.bodyHealth
+                    cacheVeh[Vehicles[k].plate].engine = Mods.engineHealth
+                    cacheVeh[Vehicles[k].plate].Mods = Mods
                 end
                 SetNuiFocus(true, true)
                 SendNUIMessage({
@@ -81,7 +83,6 @@ local function OpenHouseMenu()
 end
 
 local function OpenDepotMenu()
-    print(CurrentGarage)
     QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicles",
         function(Vehicles)
             if Vehicles then
@@ -184,8 +185,8 @@ function SpawnVehicle(plate, cb, IsHouse)
                     QBCore.Functions.TriggerCallback(
                         "qb-garages:server:GetVehicleProps", function(mods)
                             QBCore.Functions.SetVehicleProperties(veh, mods)
-                            SetVehicleBodyHealth(veh, cacheVeh[plate].body)
-                            SetVehicleEngineHealth(veh, cacheVeh[plate].engine)
+                            SetVehicleBodyHealth(veh, cacheVeh[plate].body+0.0)
+                            SetVehicleEngineHealth(veh, cacheVeh[plate].engine+0.0)
                             SetVehicleNumberPlateText(veh, plate)
                             exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                             TriggerEvent("vehiclekeys:client:SetOwner",
@@ -195,6 +196,7 @@ function SpawnVehicle(plate, cb, IsHouse)
 
                         end, plate)
                     DamageVeh[plate] = nil
+                    cacheVeh[plate] = nil
                 end, HouseGarages[currentHouseGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
             cb(true)
@@ -208,22 +210,22 @@ function SpawnVehicle(plate, cb, IsHouse)
                 "There is a vehicle Blocking the spawnPoint", "error")
             cb(false)
         else
-            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,
-                function(veh)
-                    QBCore.Functions.TriggerCallback(
-                        "qb-garages:server:GetVehicleProps", function(mods)
-                            QBCore.Functions.SetVehicleProperties(veh, mods)
-
-                            SetVehicleNumberPlateText(veh, plate)
-                            exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
-                            TriggerEvent("vehiclekeys:client:SetOwner",
-                                GetVehicleNumberPlateText(veh))
-                            TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
-                            SetVehicleDamage(veh, plate)
-                            Wait(500)
-                            DamageVeh[plate] = nil
-                        end, plate)
-                end, Garages[CurrentGarage].spawnPoint, false)
+            QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,function(veh)
+                QBCore.Functions.TriggerCallback("qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.SetVehicleProperties(veh, mods)
+                    SetVehicleNumberPlateText(veh, plate)
+                    SetVehicleBodyHealth(veh, cacheVeh[plate].body+0.0)
+                    SetVehicleEngineHealth(veh, cacheVeh[plate].engine+0.0)
+                    exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
+                    TriggerEvent("vehiclekeys:client:SetOwner",
+                        GetVehicleNumberPlateText(veh))
+                    TaskLookAtEntity(PlayerPedId(), veh, 5000, 2048, 3)
+                    SetVehicleDamage(veh, plate)
+                    Wait(500)
+                    DamageVeh[plate] = nil
+                    cacheVeh[plate] = nil
+                end, plate)
+            end, Garages[CurrentGarage].spawnPoint, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
 
             cb(true)
@@ -240,18 +242,21 @@ function SpawnVehicle(plate, cb, IsHouse)
         else
             QBCore.Functions.SpawnVehicle(cacheVeh[plate].vehicle,
                 function(veh)
-                    QBCore.Functions.TriggerCallback(
-                        "qb-garages:server:GetVehicleProps", function(mods)
+                    QBCore.Functions.TriggerCallback( "qb-garages:server:GetVehicleProps", function(mods)
+
                             QBCore.Functions.SetVehicleProperties(veh, mods)
                             SetVehicleNumberPlateText(veh, plate)
+                            SetVehicleBodyHealth(veh, cacheVeh[plate].body+0.0)
+                            SetVehicleEngineHealth(veh, cacheVeh[plate].engine+0.0)
                             exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskWarpPedIntoVehicle(ped, veh, -1)
-                            SetVehicleDamage(veh, plate)
+                            SetVehicleDamage(veh, plate,mods)
                             Wait(500)
+                            cacheVeh[plate] = nil
                             DamageVeh[plate] = nil
-                        end, plate)
+                    end, plate)
                 end, Depots[CurrentGarage].takeVehicle, false)
             TriggerServerEvent("qb-garages:server:UpdateState", plate)
 
@@ -272,12 +277,15 @@ function SpawnVehicle(plate, cb, IsHouse)
                         "qb-garages:server:GetVehicleProps", function(mods)
                             QBCore.Functions.SetVehicleProperties(veh, mods)
                             SetVehicleNumberPlateText(veh, plate)
+                            SetVehicleBodyHealth(veh, cacheVeh[plate].body+0.0)
+                            SetVehicleEngineHealth(veh, cacheVeh[plate].engine+0.0)
                             exports['LegacyFuel']:SetFuel(veh, cacheVeh[plate].fuel)
                             TriggerEvent("vehiclekeys:client:SetOwner",
                                 GetVehicleNumberPlateText(veh))
                             TaskWarpPedIntoVehicle(ped, veh, -1)
                             SetVehicleDamage(veh,  plate)
                             Wait(500)
+                            cacheVeh[plate] = nil
                             DamageVeh[plate] = nil
                         end, plate)
 
