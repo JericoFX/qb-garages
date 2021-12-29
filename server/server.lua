@@ -14,7 +14,7 @@ QBCore.Functions.CreateCallback("qb-garages:server:GetVehicleProps",function(sou
     local result = exports.oxmysql:fetchSync('SELECT mods FROM player_vehicles WHERE plate= ?', {plate})
     --local result2 = exports.oxmysql:fetchSync('SELECT body,engine,fuel FROM player_vehicles WHERE plate= ?', {plate})
     if result[1] then
-    cb(result[1])
+      cb(json.decode(result[1].mods))
     end
 end)
 
@@ -36,20 +36,7 @@ end)
 
 RegisterNetEvent('qb-garages:server:SetVehicleProps',function(data,plate)
     local src = source
-    local Engine = math.floor(data.engine + 0.5)
-    local Body = math.floor(data.body + 0.5)
-    local Fuel = data.fuel
-    local result = exports.oxmysql:fetchSync('SELECT mods FROM player_vehicles WHERE plate= ?', {plate})
-    local properties = json.decode(result[1].mods) 
-   -- local result2 = exports.oxmysql:fetchSync('SELECT body,engine,fuel FROM player_vehicles WHERE plate= ?', {plate})
-
-    if result[1]  then
-        properties.bodyHealth =  Body
-        properties.engineHealth =  Engine
-        properties.fuelLevel = Fuel
-    end
-    Wait(200)
-    local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET mods = ? WHERE plate= ?', {json.encode(properties),plate})
+    local result = exports.oxmysql:fetchSync('UPDATE player_vehicles SET mods = ? WHERE plate= ?', {json.encode(data),plate})
 end)
 
 QBCore.Functions.CreateCallback("qb-garages:server:CheckVeh",function(source, cb, plate, citizenid)

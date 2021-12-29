@@ -154,15 +154,13 @@ function GetCarToGarage(plate, garage)
     local Player = QBCore.Functions.GetPlayerData().citizenid
     local OtherPlayer = PlayerPedId()
     local Vehicle = GetVehiclePedIsIn(OtherPlayer)
-    local Engine = GetVehicleEngineHealth(Vehicle)
-    local Body = GetVehicleBodyHealth(Vehicle)
+  local Mods = QBCore.Functions.GetVehicleProperties(Vehicle)
     local Fuel =  exports['LegacyFuel']:GetFuel(Vehicle)
 
     QBCore.Functions.TriggerCallback("qb-garages:server:CheckVeh", function(ID)
         if ID then
             GetVehicleDamage(Vehicle, plate)
-            TriggerServerEvent("qb-garages:server:SetVehicleProps",
-                {body = Body, engine = Engine,fuel = Fuel}, plate)
+            TriggerServerEvent("qb-garages:server:SetVehicleProps",Mods, plate)
             TaskLeaveVehicle(OtherPlayer, Vehicle, 1)
             Wait(2000)
             if not AreAnyVehicleSeatsFree(Vehicle) then

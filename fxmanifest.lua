@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 description 'FX GARAGE'
-version '1.0.2'
+version '1.0.3'
 author 'JericoFX'
 ui_page 'html/index.html'
 
