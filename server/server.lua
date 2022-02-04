@@ -4,15 +4,16 @@ local CacheInfo = {}
 QBCore.Functions.CreateCallback("qb-garages:server:GetVehicles",function(source, cb, garage)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local GetVehicles = exports.oxmysql:fetchSync("SELECT * FROM player_vehicles WHERE citizenid = ? AND garage = ?",{Player.PlayerData.citizenid, garage})
+    local GetVehicles = MySQL.query.await("SELECT * FROM player_vehicles WHERE citizenid = ? AND garage = ?",{Player.PlayerData.citizenid, garage})
+    QBCore.Debug(GetVehicles)
     cb(GetVehicles)
 end)
 
 QBCore.Functions.CreateCallback("qb-garages:server:GetVehicleProps",function(source, cb, plate)
     local src = source
     local properties = {}
-    local result = exports.oxmysql:fetchSync('SELECT mods FROM player_vehicles WHERE plate= ?', {plate})
-    --local result2 = exports.oxmysql:fetchSync('SELECT body,engine,fuel FROM player_vehicles WHERE plate= ?', {plate})
+    local result = MySQL.query.await('SELECT mods FROM player_vehicles WHERE plate= ?', {plate})
+    --local result2 = MySQL.prepare.await('SELECT body,engine,fuel FROM player_vehicles WHERE plate= ?', {plate})
     if result[1] then
       cb(json.decode(result[1].mods))
     end
@@ -24,35 +25,35 @@ RegisterServerEvent('SaveWeelsDamage', function(Ta,plate)
         return
     end
 
-    local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET damages = ? WHERE plate = ?  ',{json.encode(Ta),plate})
+    local result = MySQL.prepare.await('UPDATE player_vehicles SET damages = ? WHERE plate = ?  ',{json.encode(Ta),plate})
 end)
 
 QBCore.Functions.CreateCallback('qb-garages:server:ReturnDamage',function(source,cb,plate)
 
-    local result = exports.oxmysql:fetchSync('SELECT damages FROM player_vehicles WHERE plate = ?',{plate})
+    local result = MySQL.prepare.await('SELECT damages FROM player_vehicles WHERE plate = ?',{plate})
     cb(json.decode(result[1].damages))
 end)
 
 
 RegisterNetEvent('qb-garages:server:SetVehicleProps',function(data,plate)
     local src = source
-    local result = exports.oxmysql:fetchSync('UPDATE player_vehicles SET mods = ? WHERE plate= ?', {json.encode(data),plate})
+    local result = MySQL.query.await('UPDATE player_vehicles SET mods = ? WHERE plate= ?', {json.encode(data),plate})
 end)
 
 QBCore.Functions.CreateCallback("qb-garages:server:CheckVeh",function(source, cb, plate, citizenid)
     local src = source
-    local result = exports.oxmysql:executeSync( 'SELECT citizenid FROM player_vehicles WHERE plate= ?',{ plate})
+    local result = MySQL.query.await( 'SELECT citizenid FROM player_vehicles WHERE plate= ?',{ plate})
     if result[1].citizenid == citizenid then cb(true) end
 end)
 
 RegisterNetEvent('qb-garages:server:UpdateState', function(plate)
-    local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET state = 0, garage = "" WHERE plate = ?',{plate})
+    local result = MySQL.query.await('UPDATE player_vehicles SET state = 0, garage = "" WHERE plate = ?',{plate})
 end)
 
 RegisterNetEvent('qb-garages:server:SaveCar', function(garage,plate)
     local Garage = tostring(garage)
     local Plate = tostring(plate)
-    exports.oxmysql:execute('UPDATE player_vehicles SET state = 1, garage = ? WHERE plate = ?',{Garage, Plate})
+    MySQL.prepare('UPDATE player_vehicles SET state = 1, garage = ? WHERE plate = ?',{Garage, Plate})
 end)
 
 QBCore.Functions.CreateCallback('qb-garages:server:HasMoney',function(source, cb)
@@ -70,7 +71,7 @@ end)
 QBCore.Functions.CreateCallback("qb-garages:server:GetHouseVehicles",function(source, cb, house)
     local src = source
     local pData = QBCore.Functions.GetPlayer(src)
-    exports.oxmysql:fetch('SELECT * FROM player_vehicles WHERE garage = ?', {house}, function(result)
+    MySQL.query('SELECT * FROM player_vehicles WHERE garage = ?', {house}, function(result)
         if result[1] ~= nil then
             cb(result)
         else
@@ -82,7 +83,7 @@ end)
 QBCore.Functions.CreateCallback("qb-garage:server:checkVehicleHouseOwner",function(source, cb, plate, house)
     local src = source
     local pData = QBCore.Functions.GetPlayer(src)
-    exports.oxmysql:fetch('SELECT * FROM player_vehicles WHERE plate = ?',{plate}, function(result)
+    MySQL.query('SELECT * FROM player_vehicles WHERE plate = ?',{plate}, function(result)
         if result[1] ~= nil then
             local hasHouseKey = exports['qb-houses']:hasKey(result[1].license, result[1].citizenid,house)
             if hasHouseKey then
@@ -97,10 +98,10 @@ QBCore.Functions.CreateCallback("qb-garage:server:checkVehicleHouseOwner",functi
 end)
 RegisterServerEvent('qb-garage:server:GetImpounded', function(citizenid)
     if citizenid then
-    local Plate = exports.oxmysql:fetchSync('SELECT plate FROM player_vehicles WHERE state = 0 AND citizenid = ?',{citizenid})
+    local Plate = MySQL.prepare.await('SELECT plate FROM player_vehicles WHERE state = 0 AND citizenid = ?',{citizenid})
         if Plate then
           for k,v in pairs(Plate) do
-             local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET state = 2, garage = "hayesdepot" WHERE plate = ? ',{Plate[k].plate})
+             local result = MySQL.query.await('UPDATE player_vehicles SET state = 2, garage = "hayesdepot" WHERE plate = ? ',{Plate[k].plate})
           end
         end
     end
@@ -110,10 +111,10 @@ AddEventHandler('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() ~= resourceName) then
     return
   end
-    local Plate = exports.oxmysql:fetchSync('SELECT plate FROM player_vehicles WHERE state = 0') 
+    local Plate = MySQL.query.await('SELECT plate FROM player_vehicles WHERE state = 0') 
          if Plate then
             for k,v in pairs(Plate) do
-                local result = exports.oxmysql:executeSync('UPDATE player_vehicles SET state = 2, garage = "'..Config.DefaultDepot..'" WHERE plate = ? ',{Plate[k].plate})
+                local result = MySQL.query.await('UPDATE player_vehicles SET state = 2, garage = "'..Config.DefaultDepot..'" WHERE plate = ? ',{Plate[k].plate})
             end
          end
 end)
