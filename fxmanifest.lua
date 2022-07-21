@@ -13,7 +13,7 @@ client_scripts {
 
 shared_script 'config.lua'
 
-server_scripts {'GaragesConfig.lua','server/server.lua'}
+server_scripts {'@oxmysql/lib/MySQL.lua','GaragesConfig.lua','server/server.lua'}
 files {
     'html/index.html', 'html/js/*.js', 'html/css/*.css', 'html/fonts/*.css',
     'html/icons/*.css'
